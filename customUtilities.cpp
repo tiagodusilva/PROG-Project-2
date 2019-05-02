@@ -13,25 +13,52 @@ namespace cu
 		}
 	}
 
-	void strTrimLeft(string & s)
+	void strUpper(string& s)
 	{
-
+		for (size_t i = 0; i < s.size(); i++)
+		{
+			if (s.at(i) >= 'a' && s.at(i) <= 'z')
+				s.at(i) = s.at(i) + ('A' - 'a');
+		}
 	}
 
-	void strTrimRight(string & s)
+	void strTrimLeft(string & s, char c)
 	{
-
+		int index = s.find_first_not_of(c);
+		s.erase(0, index);
 	}
 
-	void strTrim(string & s)
+	void strTrimLeft(string& s)
 	{
-		cu::strTrimLeft(s);
-		cu::strTrimRight(s);
+		strTrimLeft(s, ' ');
+	}
+
+	void strTrimRight(string & s, char c)
+	{
+		int index = s.find_last_not_of(c);
+		s.erase(index + 1);
+	}
+
+	void strTrimRight(string& s)
+	{
+		strTrimRight(s, ' ');
+	}
+
+	void strTrim(string & s, char c)
+	{
+		strTrimLeft(s, c);
+		strTrimRight(s, c);
+	}
+
+	void strTrim(string& s)
+	{
+		strTrimLeft(s, ' ');
+		strTrimRight(s, ' ');
 	}
 
 	bool isFileEmpty(ifstream & fin)
 	{
-		return fin.peek() == std::ifstream::traits_type::eof();
+		return fin.peek() == ifstream::traits_type::eof();
 	}
 
 }
