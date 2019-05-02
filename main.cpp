@@ -7,5 +7,11 @@ using namespace std;
 int main()
 {
 	// Currently contains random stuff meant for testing
-	cout << "Hello user!" << endl;
+	string a, b, c;
+	getline(cin, a, '/');
+	getline(cin, b, '/');
+	if (cin.fail())
+		cout << "Failed\n";
+	getline(cin, c);
+	cout << a << '_' << b << '_' << c << endl;
 }

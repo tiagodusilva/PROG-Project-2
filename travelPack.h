@@ -17,8 +17,6 @@ private:
 	std::vector<std::string> destinations;
 	Date departureDate, returnDate;
 	int price, maxBookings, currentBookings;
-	
-	friend class Agency;
 };
 
 #endif // TRAVELPACK_H

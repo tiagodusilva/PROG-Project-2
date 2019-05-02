@@ -12,11 +12,9 @@ public:
 
 private:
 	std::string name;
-	unsigned int nif, household, totalSpent;
+	unsigned int vat, household, totalSpent;
 	std::vector<int> travelPacks;
 	Address address;
-
-	friend class Agency;
 };
 
 #endif // CLIENT_H
