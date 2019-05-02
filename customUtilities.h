@@ -51,6 +51,28 @@ namespace cu
 		Meant to be used right after opening an ifstream
 	*/
 	bool isFileEmpty(std::ifstream & fin);
+
+	/**
+		Read an int from user input, taking care of invalid inputs (not ints)
+		Presents msg + " ? "
+		Return false if user interrupts with Ctrl+Z
+	*/
+	bool readInt(int& n, const std::string msg);
+
+	/**
+		Read a string from user input, waits for a not empty string
+		Presents msg + " ? "
+		Return false if user interrupts with Ctrl+Z
+	*/
+	bool readStr(std::string& s, const std::string msg);
+
+	/**
+		Read a confirmation from user input (expects y/n answer)
+		Presents msg + " (y/n) ? "
+		Return false if user interrupts with Ctrl+Z
+	*/
+	bool readConfirmation(char& c, const std::string msg);
+
 }
 
 #endif

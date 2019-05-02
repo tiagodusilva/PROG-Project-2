@@ -1,18 +1,9 @@
 #include "address.h"
+#include "customUtilities.h"
 
 using namespace std;
 
-Address::Address()
-{
-	this->street = "Undefined Street";
-	this->doorNumber = "X";
-	this->floor = "X";
-	this->zipCode = "XXXX-XXX";
-	this->locality = "Undefined locality";
-
-}
-
-bool verifyZipCode(string & zip)
+bool verifyZipCode(const string zip)
 {
 	if (zip.size() != 8)
 		return false;
@@ -35,6 +26,84 @@ bool verifyZipCode(string & zip)
 	return true;
 }
 
+Address::Address()
+{
+	this->street = "Undefined Street";
+	this->doorNumber = "X";
+	this->floor = "X";
+	this->zipCode = "XXXX-XXX";
+	this->locality = "Undefined locality";
+
+}
+
+#pragma region GETTERS
+
+	string Address::getStreet() const
+	{
+		return this->street;
+	}
+
+	string Address::getDoorNumber() const
+	{
+		return this->doorNumber;
+	}
+
+	string Address::getFloor() const
+	{
+		return this->floor;
+	}
+
+	string Address::getZipCode() const
+	{
+		return this->zipCode;
+	}
+
+	string Address::getLocality() const
+	{
+		return this->locality;
+	}
+
+#pragma endregion
+
+#pragma region SETTERS
+
+	bool Address::setStreet(const std::string street)
+	{
+		this->street = street;
+		return true;
+	}
+
+	bool Address::setDoorNumber(const std::string doorNumber)
+	{
+		this->doorNumber = doorNumber;
+		return true;
+	}
+
+	bool Address::setFloor(const std::string floor)
+	{
+		this->floor = floor;
+		return true;
+	}
+
+	bool Address::setZipCode(const std::string zipCode)
+	{
+		if (verifyZipCode(zipCode))
+		{
+			this->zipCode = zipCode;
+			return true;
+		}
+		else
+			return false;
+	}
+
+	bool Address::setLocality(const std::string locality)
+	{
+		this->locality = locality;
+		return true;
+	}
+
+#pragma endregion
+
 std::ostream& operator<<(std::ostream& stream, const Address& address)
 {
 	stream << address.street << " / " << address.doorNumber <<
@@ -43,72 +112,61 @@ std::ostream& operator<<(std::ostream& stream, const Address& address)
 	return stream;
 }
 
-// Needs more error checking!
+std::ofstream& operator<<(ofstream& stream, const Address& address)
+{
+	stream << address.street << " / " << address.doorNumber <<
+		" / " << address.floor << " /" <<
+		address.zipCode << " / " << address.locality;
+	return stream;
+}
+
+// WARNING: Almost all error checking is done in the setters
 bool Address::readUserInput()
 {
-	cout << "Input Ctrl + Z at any point to interrupt the input" << endl;
-	do
-	{
-		cout << "Street name ? ";
-		getline(cin, this->street);
-		if (cin.eof())
-			return false;
-	} while (this->street.empty());
+	// cout << "Input Ctrl + Z at any point to interrupt the input" << endl;
+	string s;
 
 	do
 	{
-		cout << "Door number ? ";
-		getline(cin, this->street);
-		if (cin.eof())
+		if (!cu::readStr(s, "Street Name"))
 			return false;
-	} while (this->street.empty());
+	} while (!this->setStreet(s));
 
-	char c = 'o';
-
-	cout << "Do you wish to insert floor (y/n) ? ";
-	while (!(cin >> c) || !(c == 'y' || c == 'n' || c == 'Y' || c == 'N'))
+	do
 	{
-		if (cin.eof())
+		if (!cu::readStr(s, "Door Numbers"))
 			return false;
-		cin.clear();
-		cin.ignore(1000, '\n');
-		cout << "Do you wish to insert floor (y/n) ? ";
-	}
+	} while (!this->setDoorNumber(s));
 
-	cin.ignore(1000, '\n');
+	char c;
+
+	if (!cu::readConfirmation(c, "Do you wish to insert floor"))
+		return false;
 
 	if (c == 'y' || c == 'Y')
 	{
 		do
 		{
-			cout << "Floor ? ";
-			getline(cin, this->floor);
-			if (cin.eof())
+			if (!cu::readStr(s, "Floor"))
 				return false;
-		} while (this->floor.empty());
+		} while (!this->setFloor(s));
 	}
 	else
 	{
-		this->floor = "-";
+		this->setFloor("-");
 	}
 
 	do
 	{
-		cout << "Zip code (XXXX-XXX) ? ";
-		getline(cin, this->zipCode);
-		if (cin.eof())
+		if (!cu::readStr(s, "Door Numbers (XXXX-XXX)"))
 			return false;
-		// Warn user of wrong format
-	} while (this->zipCode.empty() || !verifyZipCode(this->zipCode));
-
+	} while (!this->setZipCode(s));
 
 	do
 	{
-		cout << "Locality ? ";
-		getline(cin, this->locality);
-		if (cin.eof())
+		if (!cu::readStr(s, "Locality"))
 			return false;
-	} while (this->locality.empty());
+	} while (!this->setLocality(s));
 
 	return true;
 }
