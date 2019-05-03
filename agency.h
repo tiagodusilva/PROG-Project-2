@@ -12,6 +12,7 @@ class Agency
 public:
 	Agency();
 	Agency(std::string & agencyFileName);
+
 private:
 	std::string name, url, fileNameClients, fileNamePacks;
 	Address address;
