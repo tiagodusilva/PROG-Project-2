@@ -1,4 +1,5 @@
 #include "customUtilities.h"
+#include <iostream>
 
 using namespace std;
 
@@ -59,6 +60,51 @@ namespace cu
 	bool isFileEmpty(ifstream & fin)
 	{
 		return fin.peek() == ifstream::traits_type::eof();
+	}
+
+	bool readInt(int & n, const string msg)
+	{
+		cout << msg << " ? ";
+		while (!(cin >> n))
+		{
+			if (cin.eof())
+			{
+				return false;
+			}
+			cin.clear();
+			cin.ignore(1000, '\n');
+			cout << msg << " ? ";
+		}
+
+		cin.ignore(1000, '\n');
+		return true;
+	}
+
+	bool readStr(string & s, const string msg)
+	{
+		do
+		{
+			cout << msg << " ? ";
+			getline(cin, s);
+			if (cin.eof())
+				return false;
+		} while (s.empty());
+		return true;
+	}
+
+	bool readConfirmation(char & c, const string msg)
+	{
+		string s;
+		do
+		{
+			cout << msg << " (y/n) ? ";
+			getline(cin, s);
+			if (cin.eof())
+				return false;
+		} while (s.size() != 1 || !(s.at(0) == 'y' || s.at(0) == 'Y' || s.at(0) == 'n' || s.at(0) == 'N'));
+
+		c = s.at(0);
+		return true;
 	}
 
 }
