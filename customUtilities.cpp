@@ -5,6 +5,14 @@ using namespace std;
 
 namespace cu
 {
+	bool isNum(const string& s)
+	{
+		for (size_t i = 0; i < s.size(); i++)
+			if (s.at(i) < '0' || s.at(i) > '0')
+				return false;
+		return true;
+	}
+
 	void strLower(string & s)
 	{
 		for (size_t i = 0; i < s.size(); i++)

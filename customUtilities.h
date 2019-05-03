@@ -7,6 +7,11 @@
 namespace cu
 {
 	/**
+		Returns true if all characters from string s are digits
+	*/
+	bool isNum(const string& s);
+	
+	/**
 		Changes all ASCII letters in string s to lowecase
 	*/
 	void strLower(std::string & s);
