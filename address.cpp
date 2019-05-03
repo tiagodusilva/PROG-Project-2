@@ -75,6 +75,8 @@ Address::Address()
 
 	bool Address::setDoorNumber(const std::string doorNumber)
 	{
+		if (!cu::isNum(doorNumber))
+			return false;
 		this->doorNumber = doorNumber;
 		return true;
 	}
@@ -173,20 +175,43 @@ bool Address::readUserInput()
 
 bool Address::readFromFile(ifstream & fin, unsigned int & lineTracker)
 {
-	getline(fin, this->street,'/');
-	if (fin.eof()) return false;
-	
-	getline(fin, this->doorNumber, '/');
-	if (fin.eof()) return false;
+	string s, sub;
+	int start, end;
+	getline(fin, s);
+	if (cin.eof()) return false;
 
-	getline(fin, this->floor, '/');
-	if (fin.eof()) return false;
+	start = 0;
+	end = s.find('/');
+	if (end == string::npos) return false;
+	sub = s.substr(start, end - start);
+	cu::strTrim(sub);
+	if (!this->setStreet(sub)) return false;
 
-	getline(fin, this->zipCode, '/');
-	if (fin.eof()) return false;
+	start = end + 1;
+	end = s.find('/', start);
+	if (end == string::npos) return false;
+	sub = s.substr(start, end - start);
+	cu::strTrim(sub);
+	if (!this->setDoorNumber(sub)) return false;
 
-	getline(fin, this->locality);
-	if (fin.eof()) return false;
+	start = end + 1;
+	end = s.find('/', start);
+	if (end == string::npos) return false;
+	sub = s.substr(start, end - start);
+	cu::strTrim(sub);
+	if (!this->setFloor(sub)) return false;
+
+	start = end + 1;
+	end = s.find('/', start);
+	if (end == string::npos) return false;
+	sub = s.substr(start, end - start);
+	cu::strTrim(sub);
+	if (!this->setZipCode(sub)) return false;
+
+	start = end + 1;
+	sub = s.substr(start, string::npos);
+	cu::strTrim(sub);
+	if (!this->setLocality(sub)) return false;
 
 	lineTracker++;
 	return true;
