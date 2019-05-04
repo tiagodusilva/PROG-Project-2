@@ -5,6 +5,8 @@
 #include <vector>
 #include <string>
 
+static const int PACK_OUTPUT_ALIGNMENT = 25;
+
 class TravelPack
 {
 public:
@@ -31,6 +33,9 @@ public:
 
 	// Other Methods
 
+	void printSummary();
+	friend std::ostream& operator<<(std::ostream& stream, const TravelPack& pack);
+	friend std::ofstream& operator<<(std::ofstream& stream, const TravelPack& pack);
 
 private:
 	int id;
