@@ -15,7 +15,6 @@ public:
 	Client(std::string name, unsigned vat, unsigned short household, Address address);
 	Client(std::string name, unsigned vat, unsigned short household, Address address, std::vector<int> & travelPacks, unsigned totalspent);  // client read from file
 
-
 	// GET methods
 
 	std::string getName() const;
@@ -35,7 +34,6 @@ public:
 	bool setTotalSpent(unsigned new_totalSpent);
 
 private:
-	std::map<unsigned int, std::string> vatNumbersInUse;
 	std::string name;
 	unsigned int vat, household, totalSpent;
 	std::vector<int> travelPacks;

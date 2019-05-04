@@ -113,3 +113,4 @@ bool Client::setTotalSpent(unsigned new_totalSpent) {
 ostream& operator<<(ostream& os, const Client & client) {
 	return os;
 }
+
