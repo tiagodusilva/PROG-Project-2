@@ -33,6 +33,10 @@ public:
 	bool setTravelPacksList(std::vector<int> & new_travelPacks);
 	bool setTotalSpent(unsigned new_totalSpent);
 
+	// other methods
+
+	bool changeClient(std::vector<Client> & clients);
+
 private:
 	std::string name;
 	unsigned int vat, household, totalSpent;

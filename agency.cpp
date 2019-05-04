@@ -40,6 +40,36 @@ void stringToLower(std::string& s)
 	}
 } // Used for checking locations
 
+// READ METHODS
+
+bool Agency::readAgencyFromFile(ifstream & file, unsigned int & lineTracker){
+	Address address;
+	
+	getline(file, name);
+	if (file.eof()) return false;
+	lineTracker++;
+
+	file >> vat;
+	if (file.eof()) return false;
+	file.ignore(1000, '\n');
+	lineTracker++;
+
+	getline(file, url);
+	if (file.eof()) return false;
+	lineTracker++;
+
+	if (!address.readFromFile(file, lineTracker)) return false;
+
+	getline(file, fileNameClients);
+	if (file.eof()) return false;
+	lineTracker++;
+
+	getline(file, fileNamePacks);
+	lineTracker++;
+	
+	return true;
+}
+
 bool Agency::readNewClient() {
 	string str;
 	Client newClient;
@@ -69,8 +99,6 @@ bool Agency::readNewClient() {
 
 	return true;
 }
-
-// READ METHODS
 
 bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned int & lineTracker) {
 	string str;
@@ -221,20 +249,25 @@ bool Agency::removeClient() {
 	return true;
 }
 
+
 // GET METHODS
 
 string Agency::getName() const {
 	return this->name;
 }
+
 unsigned Agency::getVAT() const {
 	return this->vat;
 }
+
 Address Agency::getAddress() const {
 	return this->address;
 }
+
 string Agency::getURL() const {
 	return this->url;
 }
+
 vector<Client> Agency::getClients() const {
 	return this->clientList;
 }
@@ -243,12 +276,20 @@ vector<TravelPack> Agency::getPacksList() const {
 	return this->packList;
 }
 
+string Agency::getFileNameClients() const {
+	return this->fileNameClients;
+}
+
+string Agency::getFileNamePacks() const {
+	return this->fileNamePacks;
+}
+
 
 // SET METHODS
 
 
 bool Agency::setName(std::string new_name) {
-	if (new_name.size() == 0) return false;
+	if (new_name.empty()) return false;
 	this->name = new_name;
 	return true;
 }

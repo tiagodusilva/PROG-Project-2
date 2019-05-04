@@ -23,6 +23,8 @@ public:
 	std::string getURL() const;
 	std::vector<Client> getClients() const;
 	std::vector<TravelPack> getPacksList() const;
+	std::string getFileNameClients() const;
+	std::string getFileNamePacks() const;
 
 	// SET METHODS
 	bool setName(std::string new_name);
@@ -35,6 +37,8 @@ public:
 
 	// Read Methods
 
+	bool readAgencyFromFile(std::ifstream & file, unsigned int & lineTracker);
+
 	bool readNewClient();  // reads client from user input
 
 	bool readClientsFromFile(std::ifstream & file,  unsigned int & lineTracker); // reads clients from file
@@ -42,7 +46,7 @@ public:
 
 	// Other Methods
 
-	bool removeClient(); 
+	bool removeClient();
 
 private:
 	std::string name, url, fileNameClients, fileNamePacks;
