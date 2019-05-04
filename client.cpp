@@ -18,6 +18,15 @@ Client::Client()
 	travelPacks = {};
 }
 
+Client::Client(string name, unsigned vat, unsigned short household, Address address) {
+	this->travelPacks = {};
+	this->totalSpent = 0;
+	this->name = name;
+	this->vat = vat;
+	this->household = household;
+	this->address = address;
+}
+
 Client::Client(string name, unsigned vat, unsigned short household, Address address, vector<int> & travelPacks, unsigned totalSpent) {
 	this->name = name;
 	this->vat = vat;
@@ -27,53 +36,8 @@ Client::Client(string name, unsigned vat, unsigned short household, Address addr
 	this->totalSpent = totalSpent;
 }
 
-vector<int> Client::readTravelPacksID(string travelPacks, unsigned int & lineTracker) {
-	int id;
-	stringstream sstream(travelPacks);
-	vector<int> travelPacksVector;
-	while (sstream >> id) {
-		travelPacksVector.push_back(id);
-		if (sstream.peek() == ';')
-			sstream.ignore();
-	}
-	lineTracker++;
-	return travelPacksVector;
-}
 
-bool Client::readFromFile(ifstream & file, unsigned int & lineTracker) {
-	string name, vat, household, totalSpent, aux, travelPacks, address; // cons
-	vector<int> travelPacksVector;
-
-	Agency ag; // para teste
-
-	while (!cu::isFileEmpty(file))
-	{
-		getline(file, name); lineTracker++;
-		getline(file, vat); lineTracker++;
-		getline(file, household); lineTracker++;
-		getline(file, address); lineTracker++;
-		getline(file, travelPacks); lineTracker++;
-		getline(file, totalSpent); lineTracker++;
-
-		if (!cu::isFileEmpty(file)) {
-			getline(file, aux); lineTracker++;
-		}
-
-		travelPacksVector = readTravelPacksID(travelPacks, lineTracker);
-		Client newClient(name, stoi(vat), stoi(household), Address::Address(), travelPacksVector, stoi(totalSpent));
-
-		ag.clientList.push_back(newClient);
-	}
-
-	for (int i = 0; i < ag.clientList.size(); i++) {  // para teste
-		cout << ag.clientList[i].getName() << endl;
-	}
-
-	lineTracker++;
-	return true;
-}
-
-// GET methods
+//    GET METHODS
 
 string Client::getName() const {
 	return name;
@@ -99,7 +63,7 @@ unsigned Client::getTotalSpent() const {
 	return totalSpent;
 }
 
-// set methods
+//    SET METHODS
 
 bool Client::setName(string new_name) {
 	if (new_name.size() == 0) return false;
@@ -107,20 +71,27 @@ bool Client::setName(string new_name) {
 	return true;
 }
 
-bool Client::setVAT(unsigned new_vat) {
-	pair <map<unsigned int, string>::iterator, bool> p;
-	p = this->vatNumbersInUse.insert(pair<unsigned int, string>(new_vat, this->name));
-	if (p.second == false) {
-		cout << "VAT number already in use.\n";
-		return false;
+bool Client::setVAT(unsigned new_vat, vector<Client> clients) {
+
+	for (size_t i = 0; i < clients.size(); i++)
+		{
+			if (clients.at(i).vat == new_vat)
+			{
+				cout << "VAT number already in use!\n";
+				return false;
+			}
 	}
 	this->vat = new_vat;
+	
 	return true;
 }
 
 bool Client::setHousehold(unsigned short new_household) {
-	this->household = new_household;
-	return true;
+	if (new_household >= 1) {
+		this->household = new_household;
+		return true;
+	}
+	return false;
 }
 
 bool Client::setAddress(Address new_address) {
@@ -138,8 +109,7 @@ bool Client::setTotalSpent(unsigned new_totalSpent) {
 	return true;
 }
 
+// not used 
 ostream& operator<<(ostream& os, const Client & client) {
 	return os;
 }
-
-
