@@ -9,8 +9,8 @@ TravelPack::TravelPack()
 {
 	id = 0;
 	destinations = {};
-	departureDate = Date();
-	returnDate = Date();
+	departureDate = Date(0, 0, 0);
+	returnDate = Date(999999, 12, 31);
 	price = 0;
 	maxBookings = 0;
 	currentBookings = 0;
@@ -26,6 +26,18 @@ int TravelPack::getId() const
 std::vector<std::string> TravelPack::getDestinations() const
 {
 	return this->destinations;
+}
+
+std::string TravelPack::getDestinationAt(const int pos) const
+{
+	if (pos >= this->destinations.size())
+		return "";
+	return this->destinations.at(pos);
+}
+
+int TravelPack::getDestinationsSize() const
+{
+	return this->destinations.size();
 }
 
 Date TravelPack::getDeparture() const
@@ -56,6 +68,12 @@ int TravelPack::getCurrentBookings() const
 #pragma endregion
 
 #pragma region SETTERS
+
+bool TravelPack::setId(const int id)
+{
+	this->id = id;
+	return true;
+}
 
 bool TravelPack::setDestinations(const std::vector<std::string>& destinations)
 {
@@ -122,6 +140,23 @@ void TravelPack::printSummary()
 	cout << "Avaiable tickets: " << (this->maxBookings - this->currentBookings) << endl;
 }
 
+void TravelPack::makeAvaiable()
+{
+	this->id = abs(this->id);
+}
+
+void TravelPack::makeUnavaiable()
+{
+	this->id = -abs(this->id);
+}
+
+void TravelPack::updateAvaiability()
+{
+	Date now = Date().now();
+	if (this->departureDate < now || this->currentBookings >= this->maxBookings)
+		this->makeUnavaiable();
+}
+
 std::ostream& operator<<(std::ostream& stream, const TravelPack& pack)
 {
 	stream << setw(PACK_OUTPUT_ALIGNMENT) << "Id: " << pack.id << endl;
@@ -145,7 +180,7 @@ std::ostream& operator<<(std::ostream& stream, const TravelPack& pack)
 
 	stream << setw(PACK_OUTPUT_ALIGNMENT) << "Price: " << pack.price << endl;
 	stream << setw(PACK_OUTPUT_ALIGNMENT) << "Max Bookings: " << pack.maxBookings << endl;
-	stream << setw(PACK_OUTPUT_ALIGNMENT) << "Current Bookings: " << pack.currentBookings << endl;
+	stream << setw(PACK_OUTPUT_ALIGNMENT) << "Current Bookings: " << pack.currentBookings;
 
 	return stream;
 }
