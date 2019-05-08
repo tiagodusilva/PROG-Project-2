@@ -29,8 +29,8 @@ public:
 	// Other methods
 
 	/**
-	Outputs Address to ostream, does not get called on ofstream
-*/
+		Outputs Address to ostream, does not get called on ofstream
+	*/
 	friend std::ostream& operator<< (std::ostream& stream, const Address& address);
 
 	/**
@@ -39,8 +39,8 @@ public:
 	friend std::ofstream& operator<<(std::ofstream& stream, const Address& address);
 
 	/**
-		Call to read an Address from a user
-		Returns false if the user breaks the input by using Ctrl+Z
+		Read an Address from user input
+		Ctrl + Z to abort input (returns false)
 	*/
 	bool readUserInput();
 

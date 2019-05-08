@@ -25,6 +25,11 @@ public:
 	*/
 	Date now();
 
+	/*
+		Reads a Date from user input
+		Guarentees a valid Date
+		Ctrl + Z to abort input (returns false)
+	*/
 	bool readUserInput();
 	bool readFromFile(std::ifstream& fin, unsigned int& lineTracker);
 
