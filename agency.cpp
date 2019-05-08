@@ -1,8 +1,5 @@
 #include "agency.h"
-#include "address.h"
 #include "customUtilities.h"
-#include "client.h"
-#include <fstream>
 
 using namespace std;
 
@@ -18,33 +15,84 @@ Agency::Agency()
 	clientList = {};
 }
 
-Agency::Agency(std::string& agencyFileName)
-{
-	// TEMP
-	name = "Undefined Name";
-	url = "404";
-	fileNameClients = "";
-	fileNamePacks = "";
-	address = Address();
-	vat = 0;
-	packList = {};
-	clientList = {};
-} // Replace once read agency from file is complete
+#pragma region GETTERS
 
-void stringToLower(std::string& s)
+string Agency::getName() const {
+	return this->name;
+}
+
+unsigned Agency::getVAT() const {
+	return this->vat;
+}
+
+Address Agency::getAddress() const {
+	return this->address;
+}
+
+string Agency::getURL() const {
+	return this->url;
+}
+
+vector<Client> Agency::getClients() const {
+	return this->clientList;
+}
+
+vector<TravelPack> Agency::getPacksList() const {
+	return this->packList;
+}
+
+string Agency::getFileNameClients() const {
+	return this->fileNameClients;
+}
+
+string Agency::getFileNamePacks() const {
+	return this->fileNamePacks;
+}
+
+#pragma endregion
+
+#pragma region SETTERS
+
+bool Agency::setName(std::string new_name) {
+	if (new_name.empty()) return false;
+	this->name = new_name;
+	return true;
+}
+
+bool Agency::setVATnumber(unsigned new_VAT) {
+	this->vat = new_VAT;
+	return true;
+}
+
+bool Agency::setAddress(Address new_address) {
+	this->address = new_address;
+	return true;
+}
+
+bool Agency::setURL(std::string new_url) {
+	if (new_url.size() == 0) return false;
+	this->url = new_url;
+	return true;
+}
+
+bool Agency::setClients(std::vector<Client> & new_clients)
 {
-	for (size_t i = 0; i < s.size(); i++)
-	{
-		if (s.at(i) >= 'A' && s.at(i) <= 'Z')
-			s.at(i) = s.at(i) + ('a' - 'A');
-	}
-} // Used for checking locations
+	this->clientList = new_clients;
+	return true;
+}
+
+bool Agency::setPackets(std::vector<TravelPack> & new_packList) {
+	this->packList = new_packList;
+	return true;
+}
+
+#pragma endregion
 
 // READ METHODS
 
-bool Agency::readAgencyFromFile(ifstream & file, unsigned int & lineTracker){
+bool Agency::readAgencyFromFile(ifstream & file, unsigned int & lineTracker) {
 	Address address;
-	
+
 	getline(file, name);
 	if (file.eof()) return false;
 	lineTracker++;
@@ -66,11 +114,11 @@ bool Agency::readAgencyFromFile(ifstream & file, unsigned int & lineTracker){
 
 	getline(file, fileNamePacks);
 	lineTracker++;
-	
+
 	return true;
 }
 
-bool Agency::readNewClient() {
+bool Agency::readNewClientUserInput() {
 	string str;
 	Client newClient;
 	Address auxAddress;
@@ -87,18 +135,342 @@ bool Agency::readNewClient() {
 		if (!cu::readStr(str, "Household")) return false;
 	} while (!newClient.setHousehold(stoi(str)));
 
-	
-    cout << "Address:" << endl;
+	do
+	{
+		cout << "Address:" << endl;
+		if (!auxAddress.readUserInput())
+			return false;
+	} while (!newClient.setAddress(auxAddress));
 
-	if (!auxAddress.readUserInput())
-		return false;
-
-	newClient.setAddress(auxAddress);
-
-	clientList.push_back(newClient);
+	this->clientList.push_back(newClient);
 
 	return true;
 }
+
+bool Agency::readClientsFromFile(std::ifstream & file, unsigned int & lineTracker)
+{
+	while (true)
+	{
+		Client client;
+
+		if (!readClientFromFile(file, client, lineTracker))
+			return false;
+
+		this->clientList.push_back(client);
+
+		if (file.peek() != ':')
+			break;
+
+		lineTracker++;
+		file.ignore(1000, '\n');
+	}
+	return true;
+}
+
+bool Agency::readNewPackUserInput()
+{
+	string s;
+	int n;
+	vector<string> destinations = {};
+	Date date;
+	TravelPack pack;
+
+	if (!cu::readStr(s, "Main destination"))
+		return false;
+	destinations.push_back(s);
+
+	char c = 'o';
+	if (!cu::readConfirmation(c, "Insert secondary destinations"))
+		return false;
+
+	if (c == 'y' || c == 'Y')
+	{
+		cout << "Write \"stop\" to finish inputting secondary destinations" << endl;
+		do
+		{
+			if (!cu::readStr(s, "Destinations"))
+				return false;
+			destinations.push_back(s);
+		} while (s != "stop");
+		destinations.pop_back(); // Removes the extra "stop"
+	}
+	if (!pack.setDestinations(destinations))
+		return false; // Extra safety, should never return false
+
+	do
+	{
+		cout << "Departure date:" << endl;
+		if (!date.readUserInput())
+			return false;
+	} while (!pack.setDeparture(date));
+
+	do
+	{
+		cout << "Return date:" << endl;
+		if (!date.readUserInput())
+			return false;
+	} while (!pack.setReturn(date));
+
+	do
+	{
+		if (!cu::readInt(n, "Price"))
+			return false;
+	} while (!pack.setPrice(n));
+
+	pack.setCurrentBookings(0);
+	do
+	{
+		if (!cu::readInt(n, "Maximum bookings"))
+			return false;
+	} while (!pack.setMaxBookings(n));
+
+	pack.setId(this->maxPackId);
+	this->maxPackId++;
+
+	return true;
+}
+
+bool Agency::readAllPacksFromFile()
+{
+	ifstream fin;
+	unsigned int lineTracker = 0;
+	fin.open(this->fileNamePacks);
+	if (cu::isFileEmpty(fin))
+	{
+		cerr << "ERROR: File \"" << this->fileNamePacks << "\" is empty" << endl;
+		cout << "A fatal error occurred, terminating program..." << endl;
+		exit(42); // For now, it aborts the program
+		return false;
+	}
+
+	int n;
+	fin >> n;
+	if (fin.eof() || fin.fail()) return false;
+	this->maxPackId = abs(n);
+	lineTracker++;
+
+	while (true)
+	{
+		TravelPack aux;
+		if (!this->readPackFromFile(fin, aux, lineTracker))
+		{
+			cerr << "ERROR: Wrong input at line " << lineTracker << " of file \"" << this->fileNamePacks << "\"" << endl;
+			return false;
+		}
+
+		this->packList.push_back(aux);
+
+		if (fin.peek() != ':')
+			break;
+
+		fin.ignore(1000, '\n');
+	}
+	return true;
+}
+
+
+// OUTPUT METHODS
+
+void Agency::printPacks() const
+{
+	if (this->packList.size() == 0)
+	{
+		cout << "No registered packs" << endl;
+		return;
+	}
+
+	cout << this->packList.front() << endl;
+	for (size_t i = 1; i < this->packList.size(); i++)
+	{
+		cout << "-----------//----------" << endl;
+		cout << this->packList.at(i) << endl;
+	}
+}
+
+void Agency::printPacksByDestination(const string & s) const
+{
+	string sl = s, aux;
+	cu::strTrim(sl);
+	cu::strLower(sl);
+	if (this->packList.size() == 0)
+	{
+		cout << "No registered packs" << endl;
+		return;
+	}
+
+	int count = 0;
+	for (size_t i = 0; i < this->packList.size(); i++)
+	{
+		for (size_t j = 0; j < this->packList.at(i).getDestinationsSize(); j++)
+		{
+			aux = this->packList.at(i).getDestinationAt(j);
+			cu::strLower(aux);
+			if (aux.find(sl) != string::npos)
+			{
+				if (count == 0)
+				{
+					cout << this->packList.at(i) << endl;
+					count++;
+				}
+				else
+				{
+					cout << "----------//----------" << endl;
+					cout << this->packList.at(i) << endl;
+				}
+			}
+		}
+	}
+	if (count == 0)
+		cout << "No packs matching the location \"" << s << "\"" << endl;
+}
+
+void Agency::printPacksByDate(const Date & start, const Date & end) const
+{
+	if (this->packList.size() == 0)
+	{
+		cout << "No registered packs" << endl;
+		return;
+	}
+
+	int count = 0;
+	for (size_t i = 0; i < this->packList.size(); i++)
+	{
+		for (size_t j = 0; j < this->packList.at(i).getDestinationsSize(); j++)
+		{
+			if (start <= this->packList.at(i).getDeparture()
+				&& end >= this->packList.at(i).getReturn())
+			{
+				if (count == 0)
+				{
+					cout << this->packList.at(i) << endl;
+					count++;
+				}
+				else
+				{
+					cout << "----------//----------" << endl;
+					cout << this->packList.at(i) << endl;
+				}
+			}
+		}
+	}
+	if (count == 0)
+		cout << "No packs during the interval " << start << " to " << end << endl;
+}
+
+void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, const Date& end) const
+{
+	string sl = s, aux;
+	cu::strTrim(sl);
+	cu::strLower(sl);
+	if (this->packList.size() == 0)
+	{
+		cout << "No registered packs" << endl;
+		return;
+	}
+
+	int count = 0;
+	for (size_t i = 0; i < this->packList.size(); i++)
+	{
+		for (size_t j = 0; j < this->packList.at(i).getDestinationsSize(); j++)
+		{
+			aux = this->packList.at(i).getDestinationAt(j);
+			cu::strLower(aux);
+			cout << aux << endl;
+			if (sl.find(aux) != string::npos
+				&& start <= this->packList.at(i).getDeparture()
+				&& end >= this->packList.at(i).getReturn())
+			{
+				if (count == 0)
+				{
+					cout << this->packList.at(i) << endl;
+					count++;
+				}
+				else
+				{
+					cout << "----------//----------" << endl;
+					cout << this->packList.at(i) << endl;
+				}
+			}
+
+		}
+	}
+	if (count == 0)
+		cout << "No packs matching the location \"" << s << "\"" << endl;
+}
+
+
+// OTHER PUBLIC METHODS
+
+bool Agency::removeClient()
+{
+
+	int vat;
+	int option = 0;
+
+	if (this->clientList.size() == 0) {
+		cout << "No clients to be removed" << endl;
+		return false;
+	}
+
+	cout << "1. Remove by VAT number" << endl
+		<< "2. Select from client list" << endl;
+
+	while (true) {
+		cu::readInt(option, "Option");
+		if (option >= 1 && option <= 2) break;
+		else cout << "Not a valid option!" << endl;
+	}
+
+	if (option == 1) {
+		while (true) {
+			cu::readInt(vat, "VAT number");
+			for (size_t i = 0; i < this->clientList.size(); i++) {
+				if (this->clientList.at(i).getVAT() == vat) {
+					this->clientList.erase(this->clientList.begin() + i);
+					cout << "Client removed" << endl;
+					return true;
+				}
+			}
+			cout << "Client not found" << endl;
+		}
+	}
+	else {
+		for (size_t j = 0; j < this->clientList.size(); j++) {
+			cout << j + 1 << "." << this->clientList.at(j).getName() << " - VAT :"
+				<< this->clientList.at(j).getVAT() << endl;
+		}
+
+		while (true) {
+			cu::readInt(option, "Option");
+			if (1 <= option && option <= this->clientList.size() + 1) break;
+			else cout << "Not a valid option!" << endl;
+		}
+		this->clientList.erase(this->clientList.begin() + option - 1);
+		cout << "Client removed" << endl;
+		return true;
+
+	}
+	return true;
+}
+
+bool Agency::isVatUsed(unsigned vat)
+{
+	bool foundVat = true;
+
+	for (size_t i = 0; i < this->clientList.size(); i++)
+	{
+		if (vat != this->clientList.at(i).getVAT())
+		{
+			foundVat = false;
+			break;
+		}
+	}
+
+	return foundVat;
+}
+
+
+// PRIVATE METHODS
 
 bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned int & lineTracker) {
 	string str;
@@ -170,154 +542,87 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 	lineTracker++;
 
 	file.ignore(1000, '\n');
-	
+
 	return true;
 }
 
-bool Agency::readClientsFromFile(std::ifstream & file, unsigned int & lineTracker)
+bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned int& lineTracker)
 {
-	while (true)
-	{
-		Client client;
+	int n;
+	string s;
+	Date date;
 
-		if (!readClientFromFile(file, client, lineTracker))
-			return false;
-
-		clientList.push_back(client);
-
-		if (file.peek() != ':')
-			break;
-
-		lineTracker++;
-		file.ignore(1000, '\n');
-	}
-	return true;
-}
-
-/*
-	remove client by inserting a vat or choosing from a list of clients
-*/
-
-bool Agency::removeClient() {
-
-	int vat; 
-	int option=0;
-
-	if (clientList.size() == 0) {
-		cout << "No clients to be removed" << endl;
+	// TODO: Verify if the ID hasn't been used yet
+	fin >> n;
+	if (fin.eof() || fin.fail() || !pack.setId(n))
 		return false;
+	lineTracker++;
+
+	fin.ignore(1000, '\n');
+
+
+	getline(fin, s);
+	if (fin.eof()) return false;
+
+	// Separate all read locations
+	int start = 0, end = s.find('-');
+	string sub;
+	vector<string> destinations = {};
+
+	if (end == string::npos)
+	{
+		// There are no secondary locations
+		cu::strTrim(s);
+		destinations.push_back(s);
+	}
+	else
+	{
+		sub = s.substr(0, end);
+		cu::strTrim(sub);
+		destinations.push_back(sub);
+
+		do
+		{
+			// There are secondary locations
+			start = end + 1;
+			end = s.find(',', start);
+			sub = s.substr(start, end - start);
+			cu::strTrim(sub);
+			destinations.push_back(sub);
+
+		} while (end != string::npos); // Stops reading once there's nothing more
 	}
 
-	cout << "1. Remove by VAT number" << endl
-		<< "2. Select from client list" << endl;
+	if (!pack.setDestinations(destinations))
+		return false;
+	lineTracker++;
 
-	while (true) {
-		cu::readInt(option, "Option");
-		if (option >= 1 && option <= 2) break;
-		else cout << "Not a valid option!" << endl;
-	}
+	if (!date.readFromFile(fin, lineTracker) || !pack.setDeparture(date))
+		return false;
+	lineTracker++;
 
-	if (option == 1) {
-		while (true) {
-			cu::readInt(vat, "VAT number");
-			for (size_t i = 0; i < clientList.size(); i++) {
-				if (clientList.at(i).getVAT() == vat) {
-					clientList.erase(clientList.begin() + i);
-					cout << "Client removed" << endl;
-					return true;
-				}
-			}
-			cout << "Client not found" << endl;
-		}
-	}
-	else {
-		for (size_t j = 0; j < clientList.size(); j++) {
-			cout << j + 1 << "." << clientList.at(j).getName() << " - VAT :"
-				<< clientList.at(j).getVAT() << endl;
-		}
+	if (!date.readFromFile(fin, lineTracker) || !pack.setReturn(date))
+		return false;
+	lineTracker++;
 
-		while (true) {
-			cu::readInt(option, "Option");
-			if (1 <= option && option <= clientList.size() + 1) break;
-			else cout << "Not a valid option!" << endl;
-		}
-		clientList.erase(clientList.begin() + option - 1);
-		cout << "Client removed" << endl;
-		return true;
+	fin >> n;
+	if (fin.eof() || fin.fail() || !pack.setPrice(n))
+		return false;
+	lineTracker++;
 
-	}
+	fin >> n;
+	if (fin.eof() || fin.fail() || !pack.setMaxBookings(n))
+		return false;
+	lineTracker++;
+
+	fin >> n;
+	if (fin.eof() || fin.fail() || !pack.setCurrentBookings(n))
+		return false;
+	lineTracker++;
+
+	fin.ignore(1000, '\n');
+
+	pack.updateAvaiability();
+
 	return true;
 }
-
-
-// GET METHODS
-
-string Agency::getName() const {
-	return this->name;
-}
-
-unsigned Agency::getVAT() const {
-	return this->vat;
-}
-
-Address Agency::getAddress() const {
-	return this->address;
-}
-
-string Agency::getURL() const {
-	return this->url;
-}
-
-vector<Client> Agency::getClients() const {
-	return this->clientList;
-}
-
-vector<TravelPack> Agency::getPacksList() const {
-	return this->packList;
-}
-
-string Agency::getFileNameClients() const {
-	return this->fileNameClients;
-}
-
-string Agency::getFileNamePacks() const {
-	return this->fileNamePacks;
-}
-
-
-// SET METHODS
-
-
-bool Agency::setName(std::string new_name) {
-	if (new_name.empty()) return false;
-	this->name = new_name;
-	return true;
-}
-
-bool Agency::setVATnumber(unsigned new_VAT) {
-	this->vat = new_VAT;
-	return true;
-}
-
-bool Agency::setAddress(Address new_address) {
-	this->address = new_address;
-	return true;
-}
-
-bool Agency::setURL(std::string new_url) {
-	if (new_url.size() == 0) return false;
-	this->url = new_url;
-	return true;
-}
-
-bool Agency::setClients(std::vector<Client> & new_clients)
-{
-	this->clientList = new_clients;
-	return true;
-}
-
-bool Agency::setPackets(std::vector<TravelPack> & new_packList) {
-	this->packList = new_packList;
-	return true;
-}
-
