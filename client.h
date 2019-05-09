@@ -3,10 +3,12 @@
 
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <vector>
-#include "agency.h"
 #include "address.h"
-#include <map>
+
+const int CLIENT_OUTPUT_ALIGNMENT = 15;
+const std::string CLIENT_OUTPUT_SEPARATOR = " ----------------//----------------";
 
 class Client
 {
@@ -33,9 +35,16 @@ public:
 	bool setTravelPacksList(std::vector<int> & new_travelPacks);
 	bool setTotalSpent(unsigned new_totalSpent);
 
-	// other methods
+	// OTHER METHODS
 
 	bool changeClient(std::vector<Client> & clients);
+
+
+	// OUTPUT STREAM OPERATOR OVERRIDES
+
+	friend std::ostream& operator<< (std::ostream & stream, const Client & client);
+
+	friend std::ofstream& operator<< (std::ofstream & stream, const Client & client);
 
 private:
 	std::string name;

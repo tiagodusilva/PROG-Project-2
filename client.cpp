@@ -3,10 +3,9 @@
 #include "customUtilities.h"
 #include <fstream>
 #include <sstream>
+#include <iomanip>
 
 using namespace std;
-
-const int CLIENT_OUTPUT_ALIGNMENT = 25;
 
 Client::Client()
 {
@@ -162,7 +161,52 @@ bool Client::setTotalSpent(unsigned new_totalSpent) {
 	return true;
 }
 
-// not used 
-ostream& operator<<(ostream& os, const Client & client) {
-	return os;
+
+// OUTPUT STREAM OPERATOR OVERRIDES
+
+ostream& operator<<(ostream& stream, const Client & client)
+{
+	stream << setw(CLIENT_OUTPUT_ALIGNMENT) << "Name: " << client.name << endl
+		<< setw(CLIENT_OUTPUT_ALIGNMENT) << "VAT: " << client.vat << endl
+		<< setw(CLIENT_OUTPUT_ALIGNMENT) << "Household: " << client.household << endl
+		<< setw(CLIENT_OUTPUT_ALIGNMENT) << "Address: " << client.address << endl;
+
+	if (client.travelPacks.empty())
+		stream << setw(CLIENT_OUTPUT_ALIGNMENT) << "Packs: " << "No packs bought" << endl;
+	else
+	{
+		stream << setw(CLIENT_OUTPUT_ALIGNMENT) << "Packs: " << client.travelPacks.front();
+
+		for (size_t i = 1; i < client.travelPacks.size(); i++)
+			stream << ", " << client.travelPacks.at(i);
+
+		stream << endl;
+	}
+
+	stream << setw(CLIENT_OUTPUT_ALIGNMENT) << "Total spent: " << client.totalSpent;
+	return stream;
+}
+
+ofstream& operator<< (ofstream & stream, const Client & client)
+{
+	stream << client.name << endl
+		<< client.vat << endl
+		<< client.household << endl
+		<< client.address << endl;
+
+	if (client.travelPacks.empty())
+		stream << "-" << endl;
+	else
+	{
+		stream << client.travelPacks.front();
+
+		for (size_t i = 1; i < client.travelPacks.size(); i++)
+			stream << " ; " << client.travelPacks.at(i);
+
+		stream << endl;
+	}
+
+	stream << client.totalSpent;
+
+	return stream;
 }
