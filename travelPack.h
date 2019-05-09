@@ -6,7 +6,7 @@
 #include <string>
 
 static const int PACK_OUTPUT_ALIGNMENT = 20;
-static const std::string PACK_OUTPUT_SEPARATOR = "------------//------------";
+static const std::string PACK_OUTPUT_SEPARATOR = "  ---------------//---------------";
 
 class TravelPack
 {
@@ -19,7 +19,7 @@ public:
 	std::vector<std::string> getDestinations() const;
 	// Returns "" if pos is out of range
 	std::string getDestinationAt(const int pos) const;
-	int getDestinationsSize() const;
+	size_t getDestinationsSize() const;
 	Date getDeparture() const;
 	Date getReturn() const;
 	int getPrice() const;

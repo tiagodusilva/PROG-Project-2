@@ -35,7 +35,7 @@ std::string TravelPack::getDestinationAt(const int pos) const
 	return this->destinations.at(pos);
 }
 
-int TravelPack::getDestinationsSize() const
+size_t TravelPack::getDestinationsSize() const
 {
 	return this->destinations.size();
 }
@@ -207,6 +207,6 @@ std::ofstream& operator<<(std::ofstream& stream, const TravelPack& pack)
 	stream << pack.returnDate << endl;
 	stream << pack.price << endl;
 	stream << pack.maxBookings << endl;
-	stream << pack.currentBookings << endl;
+	stream << pack.currentBookings;
 	return stream;
 }
