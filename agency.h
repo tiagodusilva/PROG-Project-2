@@ -80,6 +80,11 @@ public:
 	// OUTPUT METHODS
 
 	/**
+		Prints all the Agency's clients to the screen
+	*/
+	void printClients() const;
+
+	/**
 		Prints all packs to the screen in a formatted form
 	*/
 	void printPacks() const;
@@ -101,6 +106,11 @@ public:
 
 
 	// OTHER METHODS
+
+	/**
+		Saves all the Agency data to the files specified in the object
+	*/
+	void saveData() const;
 
 	/**
 		Remove a Client by inserting a vat or choosing from a list of clients
@@ -132,6 +142,10 @@ private:
 		Returns false if it fails
 	*/
 	bool readPackFromFile(std::ifstream & fin, TravelPack & pack, unsigned & lineTracker);
+
+	void printAllClientsToFile() const;
+
+	void printAllPacksToFile() const;
 
 };
 

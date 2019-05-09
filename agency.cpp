@@ -222,19 +222,25 @@ bool Agency::readNewClientUserInput() {
 
 bool Agency::readAllClientsFromFile(std::ifstream & file, unsigned & lineTracker)
 {
+	if (cu::isFileEmpty(file))
+	{
+		cout << "WARNING: Clients file \"" << this->fileNameClients << "\" is empty" << endl;
+		cout << "Assuming there are no clients" << endl;
+		this->packList = {};
+		return true;
+	}
+
 	while (true)
 	{
-		Client client;
-
-		if (!readClientFromFile(file, client, lineTracker))
+		Client aux;
+		if (!this->readClientFromFile(file, aux, lineTracker))
 			return false;
 
-		this->clientList.push_back(client);
+		this->clientList.push_back(aux);
 
 		if (file.peek() != ':')
 			break;
 
-		lineTracker++;
 		file.ignore(1000, '\n');
 	}
 	return true;
@@ -307,7 +313,7 @@ bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker)
 {
 	if (cu::isFileEmpty(file))
 	{
-		cout << "WARNING: File \"" << this->fileNamePacks << "\" is empty" << endl;
+		cout << "WARNING: Packs file \"" << this->fileNamePacks << "\" is empty" << endl;
 		cout << "Assuming there are no travel packs" << endl;
 		this->packList = {};
 		return true;
@@ -336,11 +342,27 @@ bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker)
 }
 
 
-// OUTPUT METHODS
+// CONSOLE OUTPUT METHODS
+
+void Agency::printClients() const
+{
+	if (this->clientList.empty())
+	{
+		cout << "No registered clients" << endl;
+		return;
+	}
+
+	cout << this->clientList.front() << endl;
+	for (size_t i = 1; i < this->clientList.size(); i++)
+	{
+		cout << CLIENT_OUTPUT_SEPARATOR << endl;
+		cout << this->clientList.at(i) << endl;
+	}
+}
 
 void Agency::printPacks() const
 {
-	if (this->packList.size() == 0)
+	if (this->packList.empty())
 	{
 		cout << "No registered packs" << endl;
 		return;
@@ -466,6 +488,15 @@ void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, 
 }
 
 
+// FILE OUTPUT METHODS
+
+void Agency::saveData() const
+{
+	printAllClientsToFile();
+	printAllPacksToFile();
+	return;
+}
+
 // OTHER PUBLIC METHODS
 
 bool Agency::removeClient()
@@ -509,7 +540,7 @@ bool Agency::removeClient()
 
 		while (true) {
 			cu::readInt(option, "Option");
-			if (1 <= option && option <= this->clientList.size() + 1) break;
+			if (1 <= option && option <= (int) (this->clientList.size() + 1)) break;
 			else cout << "Not a valid option!" << endl;
 		}
 		this->clientList.erase(this->clientList.begin() + option - 1);
@@ -602,6 +633,11 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 		client.setTravelPacksList(travelPacks);
 		lineTracker++;
 	}
+	else // If it peeks a '-'
+	{
+		file.ignore(1000, '\n'); // Advance to the next line
+		client.setTravelPacksList(travelPacks); // Sets to {} ( travelPacks is initialized to {} )
+	}
 
 	file >> auxInt;
 	client.setTotalSpent(auxInt);
@@ -691,4 +727,54 @@ bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned & 
 	pack.updateAvaiability();
 
 	return true;
+}
+
+void Agency::printAllClientsToFile() const
+{
+	ofstream fout;
+	fout.open(this->fileNameClients);
+
+	if (this->clientList.empty())
+	{
+		fout.close();
+		return;
+	}
+
+	fout << this->clientList.front() << endl;
+
+	for (size_t i = 1; i < this->clientList.size(); i++)
+	{
+		fout << "::::::::::" << endl;
+		fout << clientList.at(i) << endl;
+	}
+
+	fout.close();
+
+	return;
+}
+
+void Agency::printAllPacksToFile() const
+{
+	ofstream fout;
+	fout.open(this->fileNamePacks);
+
+	fout << this->maxPackId << endl;
+
+	if (this->packList.empty())
+	{
+		fout.close();
+		return;
+	}
+
+	fout << this->packList.front() << endl;
+
+	for (size_t i = 1; i < this->packList.size(); i++)
+	{
+		fout << "::::::::::" << endl;
+		fout << packList.at(i) << endl;
+	}
+
+	fout.close();
+
+	return;
 }
