@@ -1,5 +1,4 @@
-#include "date.h"
-#include "travelPack.h"
+#include "agency.h"
 #include <iostream>
 
 using namespace std;
@@ -7,11 +6,11 @@ using namespace std;
 int main()
 {
 	// Currently contains random stuff meant for testing
-	string a, b, c;
-	getline(cin, a, '/');
-	getline(cin, b, '/');
-	if (cin.fail())
-		cout << "Failed\n";
-	getline(cin, c);
-	cout << a << '_' << b << '_' << c << endl;
+	
+	// Right now reads all the Agency data and prints all packs to the screen
+	Agency agency;
+	agency.loadData("agencyTest.txt", true);
+
+	agency.printPacks();
+
 }
