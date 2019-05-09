@@ -90,7 +90,80 @@ bool Agency::setPackets(std::vector<TravelPack> & new_packList) {
 
 // READ METHODS
 
-bool Agency::readAgencyFromFile(ifstream & file, unsigned int & lineTracker) {
+bool Agency::loadData(const std::string & agencyFileName, const bool isVerbose)
+{
+	ifstream file;
+	unsigned lineTracker = 0;
+	file.open(agencyFileName);
+	if (!file) // if file does not exist
+	{
+		if (isVerbose)
+			cerr << "ERROR: Agency file \"" << agencyFileName << "\" does not exist" << endl;
+		return false;
+	}
+	if (cu::isFileEmpty(file))
+	{
+		if (isVerbose)
+			cerr << "ERROR: Agency file is empty" << endl;
+		file.close();
+		return false;
+	}
+
+	if (!this->readAgencyFromFile(file, lineTracker))
+	{
+		if (isVerbose)
+			cerr << "ERROR: Wrong input at line " << lineTracker << " of file \"" << agencyFileName << "\"" << endl;
+		file.close();
+		return false;
+	}
+
+	file.close();
+
+	file.open(this->fileNamePacks);
+	if (!file) // if file does not exist
+	{
+		if (isVerbose)
+			cerr << "ERROR: Packs file \"" << this->fileNamePacks << "\" does not exist, shutting down..." << endl;
+		file.close();
+		exit(42);
+		return false; // Should never execute
+	}
+	lineTracker = 0;
+	if (!this->readAllPacksFromFile(file, lineTracker))
+	{
+		if (isVerbose)
+			cerr << "ERROR: Wrong input at line " << lineTracker << " of file \"" << this->fileNamePacks << "\"" << endl;
+		file.close();
+		return false;
+	}
+	file.close();
+
+	file.open(this->fileNameClients);
+	if (!file) // if file does not exist
+	{
+		if (isVerbose)
+			cerr << "ERROR: Clients file \"" << this->fileNameClients << "\" does not exist, shutting down..." << endl;
+		file.close();
+		exit(42);
+		return false; // Should never execute
+	}
+	lineTracker = 0;
+	if (!this->readAllClientsFromFile(file, lineTracker))
+	{
+		if (isVerbose)
+			cerr << "ERROR: Wrong input at line " << lineTracker << " of file \"" << this->fileNameClients << "\"" << endl;
+		file.close();
+		return false;
+	}
+	file.close();
+
+	if (isVerbose)
+		cout << "Agency data loaded correctly" << endl;
+
+	return true;
+}
+
+bool Agency::readAgencyFromFile(ifstream & file, unsigned & lineTracker) {
 	Address address;
 
 	getline(file, name);
@@ -147,7 +220,7 @@ bool Agency::readNewClientUserInput() {
 	return true;
 }
 
-bool Agency::readClientsFromFile(std::ifstream & file, unsigned int & lineTracker)
+bool Agency::readAllClientsFromFile(std::ifstream & file, unsigned & lineTracker)
 {
 	while (true)
 	{
@@ -230,40 +303,34 @@ bool Agency::readNewPackUserInput()
 	return true;
 }
 
-bool Agency::readAllPacksFromFile()
+bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker)
 {
-	ifstream fin;
-	unsigned int lineTracker = 0;
-	fin.open(this->fileNamePacks);
-	if (cu::isFileEmpty(fin))
+	if (cu::isFileEmpty(file))
 	{
-		cerr << "ERROR: File \"" << this->fileNamePacks << "\" is empty" << endl;
-		cout << "A fatal error occurred, terminating program..." << endl;
-		exit(42); // For now, it aborts the program
-		return false;
+		cout << "WARNING: File \"" << this->fileNamePacks << "\" is empty" << endl;
+		cout << "Assuming there are no travel packs" << endl;
+		this->packList = {};
+		return true;
 	}
 
 	int n;
-	fin >> n;
-	if (fin.eof() || fin.fail()) return false;
+	file >> n;
+	if (file.eof() || file.fail()) return false;
 	this->maxPackId = abs(n);
 	lineTracker++;
 
 	while (true)
 	{
 		TravelPack aux;
-		if (!this->readPackFromFile(fin, aux, lineTracker))
-		{
-			cerr << "ERROR: Wrong input at line " << lineTracker << " of file \"" << this->fileNamePacks << "\"" << endl;
+		if (!this->readPackFromFile(file, aux, lineTracker))
 			return false;
-		}
 
 		this->packList.push_back(aux);
 
-		if (fin.peek() != ':')
+		if (file.peek() != ':')
 			break;
 
-		fin.ignore(1000, '\n');
+		file.ignore(1000, '\n');
 	}
 	return true;
 }
@@ -282,7 +349,7 @@ void Agency::printPacks() const
 	cout << this->packList.front() << endl;
 	for (size_t i = 1; i < this->packList.size(); i++)
 	{
-		cout << "-----------//----------" << endl;
+		cout << PACK_OUTPUT_SEPARATOR << endl;
 		cout << this->packList.at(i) << endl;
 	}
 }
@@ -314,7 +381,7 @@ void Agency::printPacksByDestination(const string & s) const
 				}
 				else
 				{
-					cout << "----------//----------" << endl;
+					cout << PACK_OUTPUT_SEPARATOR << endl;
 					cout << this->packList.at(i) << endl;
 				}
 			}
@@ -347,7 +414,7 @@ void Agency::printPacksByDate(const Date & start, const Date & end) const
 				}
 				else
 				{
-					cout << "----------//----------" << endl;
+					cout << PACK_OUTPUT_SEPARATOR << endl;
 					cout << this->packList.at(i) << endl;
 				}
 			}
@@ -387,7 +454,7 @@ void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, 
 				}
 				else
 				{
-					cout << "----------//----------" << endl;
+					cout << PACK_OUTPUT_SEPARATOR << endl;
 					cout << this->packList.at(i) << endl;
 				}
 			}
@@ -469,10 +536,9 @@ bool Agency::isVatUsed(unsigned vat)
 	return foundVat;
 }
 
-
 // PRIVATE METHODS
 
-bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned int & lineTracker) {
+bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned & lineTracker) {
 	string str;
 	Address auxAddress;
 	vector<int> travelPacks = {};
@@ -546,7 +612,7 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 	return true;
 }
 
-bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned int& lineTracker)
+bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned & lineTracker)
 {
 	int n;
 	string s;

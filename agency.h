@@ -41,7 +41,13 @@ public:
 
 	// READ METHODS
 
-	bool readAgencyFromFile(std::ifstream & file, unsigned int & lineTracker);
+	/**
+		Loads all the data related to an Agency
+		If isVerbose is true, it print to cout/cerr the status of the operation
+	*/
+	bool loadData(const std::string & agencyFileName, const bool isVerbose);
+
+	bool readAgencyFromFile(std::ifstream & file, unsigned & lineTracker);
 
 	/**
 		Reads a new Client from user input
@@ -53,7 +59,7 @@ public:
 	/**
 		Reads all the Clients from a file
 	*/
-	bool readClientsFromFile(std::ifstream & file,  unsigned int & lineTracker);
+	bool readAllClientsFromFile(std::ifstream & file,  unsigned & lineTracker);
 
 	/**
 		Reads a new Pack from user input
@@ -64,8 +70,11 @@ public:
 
 	/**
 		Reads all the packs from a file
+		If file is empty, sets packList to {}
+		Returns false if it encounters an unexpected error
+		WARNING: Does not check if file exists
 	*/
-	bool readAllPacksFromFile();
+	bool readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker);
 
 
 	// OUTPUT METHODS
@@ -116,13 +125,13 @@ private:
 		Read one Client from file
 		Return false if it fails 
 	*/
-	bool readClientFromFile(std::ifstream & file, Client & client, unsigned int & lineTracker);
+	bool readClientFromFile(std::ifstream & file, Client & client, unsigned & lineTracker);
 
 	/**
 		Reads one TravelPack from file
 		Returns false if it fails
 	*/
-	bool readPackFromFile(std::ifstream & fin, TravelPack & pack, unsigned int & lineTracker);
+	bool readPackFromFile(std::ifstream & fin, TravelPack & pack, unsigned & lineTracker);
 
 };
 

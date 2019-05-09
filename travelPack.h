@@ -6,6 +6,7 @@
 #include <string>
 
 static const int PACK_OUTPUT_ALIGNMENT = 20;
+static const std::string PACK_OUTPUT_SEPARATOR = "------------//------------";
 
 class TravelPack
 {
