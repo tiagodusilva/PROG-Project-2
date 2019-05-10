@@ -140,6 +140,14 @@ void TravelPack::printSummary()
 	cout << "Avaiable tickets: " << (this->maxBookings - this->currentBookings) << endl;
 }
 
+bool TravelPack::isAvaiable() const
+{
+	if (this->id >= 1)
+		return true;
+	else
+		return false;
+}
+
 void TravelPack::makeAvaiable()
 {
 	this->id = abs(this->id);

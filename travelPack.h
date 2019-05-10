@@ -44,6 +44,10 @@ public:
 	void printSummary();
 	friend std::ostream& operator<<(std::ostream& stream, const TravelPack& pack);
 	friend std::ofstream& operator<<(std::ofstream& stream, const TravelPack& pack);
+	/*
+		Only checks if the ID is positive or negative
+	*/
+	bool isAvaiable() const;
 	void makeAvaiable();
 	void makeUnavaiable();
 	/**
