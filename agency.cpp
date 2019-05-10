@@ -344,6 +344,24 @@ bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker)
 
 // CONSOLE OUTPUT METHODS
 
+void Agency::printClientByVAT(unsigned vat) const {
+
+	if (this->clientList.empty()) {
+		cout << "No registered clients" << endl;
+		return;
+	}
+
+	for (size_t i=0; i < this->clientList.size(); i++) {
+		if (this->clientList.at(i).getVAT() == vat) {
+			cout << this->clientList.at(i) << endl;
+			return;
+		}
+	}
+
+	cout << "Client with VAT " << vat << " not found" << endl;
+	return;
+}
+
 void Agency::printClients() const
 {
 	if (this->clientList.empty())
@@ -551,15 +569,74 @@ bool Agency::removeClient()
 	return true;
 }
 
-bool Agency::isVatUsed(unsigned vat)
+bool Agency::changeClient(unsigned vat) {
+	int i, num;
+	string str;
+	Address auxAddress;
+
+	if (this->clientList.size() == 0) {
+		cout << "No clients to be changed" << endl;
+		return false;
+	}
+	else if (!isVatUsed(vat)) {
+		cout << "Client with VAT " << vat << " not found" << endl;
+		return false;
+	}
+
+	for (size_t j = 0; j < this->clientList.size(); j++) {
+		if (this->clientList.at(j).getVAT() == vat) {
+			i = j; break;
+		}
+	}
+
+	cout << "1. Name" << endl << "2. VAT" << endl << "3. Household" << endl
+		<< "4. Address" << endl << "0. Cancel" << endl;
+
+	while (true) {
+		cu::readInt(num, "What do you want to change");
+		if (num >= 0 && num <= 4) break;
+		else cout << "Not a valid option!" << endl;
+	}
+
+	switch (num)
+	{
+	case 1:
+		cu::readStr(str, "Name");
+		clientList.at(i).setName(str); break;
+	case 2:
+		while (true) {
+			cu::readInt(num, "VAT");
+			if (!isVatUsed(num)) break;
+		}
+		clientList.at(i).setVAT(num, this->clientList); break;
+	case 3:
+		while (true) {
+			cu::readInt(num, "Household");
+			if (num >= 1) break;
+			cout << "Insert a valid household number" << endl;
+		}
+		clientList.at(i).setHousehold(num); break;
+	case 4:
+		auxAddress.readUserInput();
+		clientList.at(i).setAddress(auxAddress); break;
+	default:
+		return false;
+	}
+
+	cout << "Client changed sucessful" << endl;
+
+	return true;
+}
+
+bool Agency::isVatUsed(unsigned vat) const
 {
-	bool foundVat = true;
+	bool foundVat = false;
 
 	for (size_t i = 0; i < this->clientList.size(); i++)
 	{
-		if (vat != this->clientList.at(i).getVAT())
+		if (vat == this->clientList.at(i).getVAT())
 		{
-			foundVat = false;
+			foundVat = true;
 			break;
 		}
 	}

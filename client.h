@@ -35,11 +35,6 @@ public:
 	bool setTravelPacksList(std::vector<int> & new_travelPacks);
 	bool setTotalSpent(unsigned new_totalSpent);
 
-	// OTHER METHODS
-
-	bool changeClient(std::vector<Client> & clients);
-
-
 	// OUTPUT STREAM OPERATOR OVERRIDES
 
 	friend std::ostream& operator<< (std::ostream & stream, const Client & client);

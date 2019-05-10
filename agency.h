@@ -59,7 +59,7 @@ public:
 	/**
 		Reads all the Clients from a file
 	*/
-	bool readAllClientsFromFile(std::ifstream & file,  unsigned & lineTracker);
+	bool readAllClientsFromFile(std::ifstream & file, unsigned & lineTracker);
 
 	/**
 		Reads a new Pack from user input
@@ -85,6 +85,11 @@ public:
 	void printClients() const;
 
 	/**
+		Prints a client with a given vat to the screen
+	*/
+	void printClientByVAT(unsigned vat) const;
+
+	/**
 		Prints all packs to the screen in a formatted form
 	*/
 	void printPacks() const;
@@ -93,7 +98,7 @@ public:
 		Prints all packs matching a given destination to the screen in a formatted form
 	*/
 	void printPacksByDestination(const std::string & s) const;
-	
+
 	/**
 		Prints all packs matching a given Date interval to the screen in a formatted form
 	*/
@@ -118,9 +123,14 @@ public:
 	bool removeClient();
 
 	/**
+		Change a Client by a given vat
+	*/
+	bool changeClient(unsigned vat);
+
+	/**
 		Returns true if a given VAT is already registered to a Client
 	*/
-	bool isVatUsed(unsigned vat);
+	bool isVatUsed(unsigned vat) const;
 
 
 private:
@@ -131,9 +141,9 @@ private:
 	std::vector<TravelPack> packList;
 	std::vector<Client> clientList;
 
-	/** 
+	/**
 		Read one Client from file
-		Return false if it fails 
+		Return false if it fails
 	*/
 	bool readClientFromFile(std::ifstream & file, Client & client, unsigned & lineTracker);
 
