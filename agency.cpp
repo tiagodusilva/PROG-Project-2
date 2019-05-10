@@ -378,23 +378,39 @@ void Agency::printClients() const
 	}
 }
 
-void Agency::printPacks() const
+void Agency::printPacks(const bool onlyAvaiable) const
 {
-	if (this->packList.empty())
+	if (this->packList.size() == 0)
 	{
 		cout << "No registered packs" << endl;
 		return;
 	}
 
-	cout << this->packList.front() << endl;
-	for (size_t i = 1; i < this->packList.size(); i++)
+	int count = 0;
+	for (size_t i = 0; i < this->packList.size(); i++)
 	{
-		cout << PACK_OUTPUT_SEPARATOR << endl;
-		cout << this->packList.at(i) << endl;
+		// if onlyAvaible is activated, will only print if its avaiable, if not, prints anyway
+		if (!onlyAvaiable || this->packList.at(i).isAvaiable())
+		{
+			if (count == 0)
+			{
+				cout << this->packList.at(i) << endl;
+				count++;
+			}
+			else
+			{
+				cout << PACK_OUTPUT_SEPARATOR << endl;
+				cout << this->packList.at(i) << endl;
+			}
+		}
 	}
+	if (count == 0)
+		// In this case, if there are no packs, it will enter the condition at the start
+		cout << "No avaiable packs found" << endl;
+
 }
 
-void Agency::printPacksByDestination(const string & s) const
+void Agency::printPacksByDestination(const string & s, const bool onlyAvaiable) const
 {
 	string sl = s, aux;
 	cu::strTrim(sl);
@@ -414,24 +430,37 @@ void Agency::printPacksByDestination(const string & s) const
 			cu::strLower(aux);
 			if (aux.find(sl) != string::npos)
 			{
-				if (count == 0)
+				// if onlyAvaible is activated, will only print if its avaiable, if not, prints anyway
+				if (!onlyAvaiable || this->packList.at(i).isAvaiable())
 				{
-					cout << this->packList.at(i) << endl;
-					count++;
+					if (count == 0)
+					{
+						cout << this->packList.at(i) << endl;
+						count++;
+					}
+					else
+					{
+						cout << PACK_OUTPUT_SEPARATOR << endl;
+						cout << this->packList.at(i) << endl;
+					}
 				}
-				else
-				{
-					cout << PACK_OUTPUT_SEPARATOR << endl;
-					cout << this->packList.at(i) << endl;
-				}
+
+				// If it finds one match, it doesn't need to check the remaining locations
+				break; 
 			}
 		}
 	}
 	if (count == 0)
-		cout << "No packs matching the location \"" << s << "\"" << endl;
+	{
+		if (onlyAvaiable)
+			cout << "No avaiable packs matching the location \"" << s << "\"" << endl;
+		else
+			cout << "No packs matching the location \"" << s << "\"" << endl;
+	}
+		
 }
 
-void Agency::printPacksByDate(const Date & start, const Date & end) const
+void Agency::printPacksByDate(const Date & start, const Date & end, const bool onlyAvaiable) const
 {
 	if (this->packList.size() == 0)
 	{
@@ -442,7 +471,8 @@ void Agency::printPacksByDate(const Date & start, const Date & end) const
 	int count = 0;
 	for (size_t i = 0; i < this->packList.size(); i++)
 	{
-		for (size_t j = 0; j < this->packList.at(i).getDestinationsSize(); j++)
+		// if onlyAvaible is activated, will only check if its avaiable, if not, checks anyway
+		if (!onlyAvaiable || this->packList.at(i).isAvaiable())
 		{
 			if (start <= this->packList.at(i).getDeparture()
 				&& end >= this->packList.at(i).getReturn())
@@ -461,10 +491,16 @@ void Agency::printPacksByDate(const Date & start, const Date & end) const
 		}
 	}
 	if (count == 0)
-		cout << "No packs during the interval " << start << " to " << end << endl;
+	{
+		if (onlyAvaiable)
+			cout << "No avaiable packs during the interval " << start << " to " << end << endl;
+		else
+			cout << "No packs during the interval " << start << " to " << end << endl;
+	}
+		
 }
 
-void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, const Date& end) const
+void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, const Date& end, const bool onlyAvaiable) const
 {
 	string sl = s, aux;
 	cu::strTrim(sl);
@@ -478,31 +514,44 @@ void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, 
 	int count = 0;
 	for (size_t i = 0; i < this->packList.size(); i++)
 	{
-		for (size_t j = 0; j < this->packList.at(i).getDestinationsSize(); j++)
+		// If onlyAvaible is activated, will only print if its avaiable, if not, prints anyway
+		// Also immediatly checks if the it's in the given Dates range
+		if ((!onlyAvaiable || this->packList.at(i).isAvaiable())
+			&& (start <= this->packList.at(i).getDeparture()
+			&& end >= this->packList.at(i).getReturn()))
 		{
-			aux = this->packList.at(i).getDestinationAt(j);
-			cu::strLower(aux);
-			cout << aux << endl;
-			if (sl.find(aux) != string::npos
-				&& start <= this->packList.at(i).getDeparture()
-				&& end >= this->packList.at(i).getReturn())
+			for (size_t j = 0; j < this->packList.at(i).getDestinationsSize(); j++)
 			{
-				if (count == 0)
+				aux = this->packList.at(i).getDestinationAt(j);
+				cu::strLower(aux);
+			
+				if (sl.find(aux) != string::npos)
 				{
-					cout << this->packList.at(i) << endl;
-					count++;
-				}
-				else
-				{
-					cout << PACK_OUTPUT_SEPARATOR << endl;
-					cout << this->packList.at(i) << endl;
-				}
-			}
+					if (count == 0)
+					{
+						cout << this->packList.at(i) << endl;
+						count++;
+					}
+					else
+					{
+						cout << PACK_OUTPUT_SEPARATOR << endl;
+						cout << this->packList.at(i) << endl;
+					}
 
+					// If it finds a match, it does not need to check the others
+					break;
+				}
+			} // End inner for loop
 		}
-	}
+	} // End outer for loop
+
 	if (count == 0)
-		cout << "No packs matching the location \"" << s << "\"" << endl;
+	{
+		if (onlyAvaiable)
+			cout << "No avaiable packs matching the location \"" << s << "\"" << endl;
+		else
+			cout << "No packs matching the location \"" << s << "\"" << endl;
+	}
 }
 
 

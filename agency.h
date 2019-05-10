@@ -92,22 +92,22 @@ public:
 	/**
 		Prints all packs to the screen in a formatted form
 	*/
-	void printPacks() const;
+	void printPacks(const bool onlyAvaiable) const;
 
 	/**
 		Prints all packs matching a given destination to the screen in a formatted form
 	*/
-	void printPacksByDestination(const std::string & s) const;
+	void printPacksByDestination(const std::string & s, const bool onlyAvaiable) const;
 
 	/**
 		Prints all packs matching a given Date interval to the screen in a formatted form
 	*/
-	void printPacksByDate(const Date & start, const Date & end) const;
+	void printPacksByDate(const Date & start, const Date & end, const bool onlyAvaiable) const;
 
 	/**
 		Prints all packs matching a given destination and Date interval to the screen in a formatted form
 	*/
-	void printPacksByDestinationAndDate(const std::string & s, const Date & start, const Date & end) const;
+	void printPacksByDestinationAndDate(const std::string & s, const Date & start, const Date & end, const bool onlyAvaiable) const;
 
 
 	// OTHER METHODS
