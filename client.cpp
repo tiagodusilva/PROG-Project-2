@@ -69,6 +69,11 @@ vector<int> Client::getTravelPacksList() const {
 	return travelPacks;
 }
 
+size_t Client::getTravelPacksListSize() const
+{
+	return this->travelPacks.size();
+}
+
 unsigned Client::getTotalSpent() const {
 	return totalSpent;
 }

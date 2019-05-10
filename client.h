@@ -24,6 +24,7 @@ public:
 	unsigned short getHousehold() const;
 	Address getAddress() const;
 	std::vector<int> getTravelPacksList() const;
+	size_t getTravelPacksListSize() const;
 	unsigned getTotalSpent() const;
 
 	// SET methods
