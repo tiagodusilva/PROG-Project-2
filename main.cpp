@@ -11,6 +11,8 @@ int main()
 	Agency agency;
 	agency.loadData("agencyTest.txt", true);
 
-	agency.printPacks();
+	
+	agency.printPacks(true);
+	agency.saveData();
 
 }
