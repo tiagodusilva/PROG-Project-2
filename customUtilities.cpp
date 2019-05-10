@@ -115,4 +115,8 @@ namespace cu
 		return true;
 	}
 
+	void pauseConsole()
+	{
+		system("pause");
+	}
 }
