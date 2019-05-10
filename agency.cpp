@@ -573,11 +573,11 @@ void Agency::printStatistics() const {
 
 	for (size_t i = 0; i < this->clientList.size(); i++) {
 		totalSold += this->clientList.at(i).getTotalSpent();
-		soldPacks += this->clientList.at(i).getTravelPacksList().size();
+		soldPacks += this->clientList.at(i).getTravelPacksListSize();
 	}
 
-	cout << "Number of sold packs: " << soldPacks << endl;
-	cout << "Total value of sold packs: " << totalSold << endl;
+	cout << "Number of packs sold: " << soldPacks << endl;
+	cout << "Total value of packs sold: " << totalSold << endl;
 }
 
 void Agency::printMostVisitedDestinations(int n) const {
