@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <map>
 
 class Client;
 
@@ -109,6 +110,15 @@ public:
 	*/
 	void printPacksByDestinationAndDate(const std::string & s, const Date & start, const Date & end, const bool onlyAvaiable) const;
 
+	/**
+		Prints the statistics of agency
+	*/
+	void printStatistics() const;
+
+	/**
+		Prints the N most visited destinations by all clients, N is given
+	*/
+	void printMostVisitedDestinations(int n) const;
 
 	// OTHER METHODS
 
@@ -132,6 +142,10 @@ public:
 	*/
 	bool isVatUsed(unsigned vat) const;
 
+	/**
+		Returns the TravelPack with the given ID
+	*/
+	TravelPack packWithId(int id) const;
 
 private:
 	int maxPackId;

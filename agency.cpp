@@ -566,6 +566,57 @@ void Agency::saveData() const
 
 // OTHER PUBLIC METHODS
 
+void Agency::printStatistics() const {
+
+	int soldPacks = 0;
+	int totalSold = 0;
+
+	for (size_t i = 0; i < this->clientList.size(); i++) {
+		totalSold += this->clientList.at(i).getTotalSpent();
+		soldPacks += this->clientList.at(i).getTravelPacksList().size();
+	}
+
+	cout << "Number of sold packs: " << soldPacks << endl;
+	cout << "Total value of sold packs: " << totalSold << endl;
+}
+
+void Agency::printMostVisitedDestinations(int n) const {
+	int auxInt = 1;
+	map<string, int> packMap;
+	multimap<int, string> reversedPackMap;
+
+	// create a map of a place and the number of times it was visited by all clients
+	for (size_t i = 0; i < this->clientList.size(); i++) { 
+
+		for (size_t j = 0; j < this->clientList.at(i).getTravelPacksList().size(); j++) { 
+
+			for (size_t k = 0; k < packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationsSize(); k++) {
+				
+				if (packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationsSize() > 1 && k==0)
+					continue;
+
+				if (packMap.find(packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)) == packMap.end())
+					packMap[packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)] = 1;
+
+				else
+					packMap[packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)] += 1;
+			}
+		}
+	}
+
+	// change the key and value of packMap in order to order by the number of visits
+	for (auto& iter: packMap)
+		reversedPackMap.insert(pair <int, string>(iter.second, iter.first));
+
+	for (auto iter = reversedPackMap.rbegin(); iter != reversedPackMap.rend(); ++iter) {
+		cout << '\t' << auxInt << ". " << iter->second;
+		cout << " (Total Visits: " <<  iter->first << ")\n\n";
+		auxInt++;
+
+		if (n + 1 == auxInt) break;
+	}
+}
+
 bool Agency::removeClient()
 {
 
@@ -691,6 +742,14 @@ bool Agency::isVatUsed(unsigned vat) const
 	}
 
 	return foundVat;
+}
+
+TravelPack Agency::packWithId(int id) const {
+	for (size_t i = 0; i < this->packList.size(); i++) {
+		if (abs(this->packList.at(i).getId()) == id)
+			return this->packList.at(i);
+	}
+	return {};
 }
 
 // PRIVATE METHODS
