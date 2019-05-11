@@ -77,10 +77,14 @@ namespace cu
 		{
 			if (cin.eof())
 			{
+				cin.clear();
 				return false;
 			}
-			cin.clear();
-			cin.ignore(1000, '\n');
+			else
+			{
+				cin.clear();
+				cin.ignore(1000, '\n');
+			}
 			cout << msg << " ? ";
 		}
 
@@ -95,7 +99,10 @@ namespace cu
 			cout << msg << " ? ";
 			getline(cin, s);
 			if (cin.eof())
+			{
+				cin.clear();
 				return false;
+			}
 		} while (s.empty());
 		return true;
 	}
@@ -108,9 +115,13 @@ namespace cu
 			cout << msg << " (y/n) ? ";
 			getline(cin, s);
 			if (cin.eof())
+			{
+				cin.clear();
 				return false;
+			}
 		} while (s.size() != 1 || !(s.at(0) == 'y' || s.at(0) == 'Y' || s.at(0) == 'n' || s.at(0) == 'N'));
 
+		strLower(s);
 		c = s.at(0);
 		return true;
 	}

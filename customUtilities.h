@@ -74,6 +74,7 @@ namespace cu
 	/**
 		Read a confirmation from user input (expects y/n answer)
 		Presents msg + " (y/n) ? "
+		If it return true, c will always "y" or "n" (lowercase)
 		Return false if user interrupts with Ctrl+Z
 	*/
 	bool readConfirmation(char& c, const std::string msg);
