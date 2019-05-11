@@ -66,7 +66,7 @@ bool Agency::getAvaiabilityOfPackAtIndex(const int index)
 {
 	if (index >= (int) this->packList.size())
 		return false;
-	return this->packList.at(index).isAvaiable();
+	return this->packList.at(index).isAvailable();
 }
 
 string Agency::getFileNameClients() const {
@@ -740,7 +740,8 @@ void Agency::saveData() const
 
 // OTHER PUBLIC METHODS
 
-bool Agency::purchasePack(int vat, const int id) {
+bool Agency::purchasePack(int vat, const int id)
+{
 
 	int tickets = -1;
 	bool packFound = false;
@@ -763,15 +764,15 @@ bool Agency::purchasePack(int vat, const int id) {
 		return false;
 	}
 
-	if (!packWithId(id).isAvailable()) { 
+	if (!this->getPackWithId(id).isAvailable()) { 
 		cout << "Pack with ID " << id << " is unavailable..." << endl;
 		return false;
 	}
 
-	cout << "Tickets available for this pack: " << packWithId(id).getMaxBookings() - packWithId(id).getCurrentBookings() << endl << endl;
+	cout << "Tickets available for this pack: " << !this->getPackWithId(id).getMaxBookings() - this->getPackWithId(id).getCurrentBookings() << endl << endl;
 
 	while (cu::readInt(tickets, "Number of tickets")) {
-		if (tickets > 0 && tickets + packWithId(id).getCurrentBookings() <= packWithId(id).getMaxBookings())
+		if (tickets > 0 && tickets + this->getPackWithId(id).getCurrentBookings() <= this->getPackWithId(id).getMaxBookings())
 			break;
 		else
 			cout << "Invalid number of tickets..." << endl;
@@ -799,7 +800,7 @@ bool Agency::purchasePack(int vat, const int id) {
 		if (this->clientList.at(j).getVAT() == vat) {
 
 			vector<int> clientPackListCopy = this->clientList.at(j).getTravelPacksList();
-			this->clientList.at(j).setTotalSpent(this->clientList.at(j).getTotalSpent() + packWithId(id).getPrice()*tickets); 
+			this->clientList.at(j).setTotalSpent(this->clientList.at(j).getTotalSpent() + this->getPackWithId(id).getPrice()*tickets);
 			
 			for (int k = 0; k < tickets; k++) {
 				clientPackListCopy.push_back(id);
@@ -865,7 +866,7 @@ bool Agency::makePackUnavaiableById(const int id)
 	int auxId = abs(id);
 	for (size_t i = 0; i < this->packList.size(); i++) {
 		if (abs(this->packList.at(i).getId()) == auxId) {
-			this->packList.at(i).makeUnavaiable();
+			this->packList.at(i).makeUnavailable();
 			cout << "Pack is now unavaiable" << endl;
 			return true;
 		}
@@ -889,7 +890,7 @@ bool Agency::makePackUnavaiableByIndex(const int index)
 		return false;
 	}
 
-	this->packList.at(index).makeUnavaiable();
+	this->packList.at(index).makeUnavailable();
 
 	cout << "Pack is now unavaiable" << endl;
 	return true;

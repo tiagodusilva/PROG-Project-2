@@ -30,7 +30,7 @@ std::vector<std::string> TravelPack::getDestinations() const
 
 std::string TravelPack::getDestinationAt(const int index) const
 {
-	if (index >= this->destinations.size())
+	if (index >= (int) this->destinations.size())
 		return "";
 	return this->destinations.at(index);
 }

@@ -46,8 +46,8 @@ public:
 	/*
 		Only checks if the ID is positive or negative
 	*/
-
 	bool isAvailable() const;
+
 	void makeAvailable();
 	void makeUnavailable();
 

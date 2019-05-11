@@ -152,7 +152,7 @@ bool Date::isLeapYear() const // Evaluate if a given year is a leap year
 
 bool Date::isValid() const
 {
-	const unsigned daysInMonth[13] = { -1, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
+	const unsigned daysInMonth[13] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
 	if (this->month >= 1 && this->month <= 12)
 	{
 		if (this->month == 2 && this->isLeapYear())
