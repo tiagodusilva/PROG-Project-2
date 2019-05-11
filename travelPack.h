@@ -18,7 +18,7 @@ public:
 	int getId() const;
 	std::vector<std::string> getDestinations() const;
 	// Returns "" if pos is out of range
-	std::string getDestinationAt(const int pos) const;
+	std::string getDestinationAt(const int index) const;
 	size_t getDestinationsSize() const;
 	Date getDeparture() const;
 	Date getReturn() const;

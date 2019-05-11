@@ -28,11 +28,11 @@ std::vector<std::string> TravelPack::getDestinations() const
 	return this->destinations;
 }
 
-std::string TravelPack::getDestinationAt(const int pos) const
+std::string TravelPack::getDestinationAt(const int index) const
 {
-	if (pos >= this->destinations.size())
+	if (index >= this->destinations.size())
 		return "";
-	return this->destinations.at(pos);
+	return this->destinations.at(index);
 }
 
 size_t TravelPack::getDestinationsSize() const
