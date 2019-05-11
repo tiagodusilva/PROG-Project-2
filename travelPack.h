@@ -47,14 +47,14 @@ public:
 	/*
 		Only checks if the ID is positive or negative
 	*/
-	bool isAvaiable() const;
-	void makeAvaiable();
-	void makeUnavaiable();
+	bool isAvailable() const;
+	void makeAvailable();
+	void makeUnavailable();
 	/**
-		Never sets packs to avaiable, only to unavaiable
+		Never sets packs to available, only to unavailable
 		Checks if the departureDate has already passed and if the capacity is full
 	*/
-	void updateAvaiability();
+	void updateAvailability();
 
 private:
 	int id;

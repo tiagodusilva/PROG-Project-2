@@ -364,7 +364,7 @@ void Agency::printClientByVAT(unsigned vat) const
 		return;
 	}
 
-	for (size_t i=0; i < this->clientList.size(); i++) {
+	for (size_t i = 0; i < this->clientList.size(); i++) {
 		if (this->clientList.at(i).getVAT() == vat) {
 			cout << this->clientList.at(i) << endl;
 			return;
@@ -430,7 +430,7 @@ void Agency::printPacksByClient(const int vat) const
 		}
 	}
 
-	cout << "Client with VAT \"" << vat << "\" not found" << endl;	
+	cout << "Client with VAT \"" << vat << "\" not found" << endl;
 }
 
 void Agency::printPackById(const int id) const
@@ -450,7 +450,7 @@ void Agency::printPackById(const int id) const
 	cout << "Pack with id \"" << id << "\" not found" << endl;
 }
 
-void Agency::printPacks(const bool onlyAvaiable) const
+void Agency::printPacks(const bool onlyAvailable) const
 {
 
 	cout << endl;
@@ -464,8 +464,8 @@ void Agency::printPacks(const bool onlyAvaiable) const
 	int count = 0;
 	for (size_t i = 0; i < this->packList.size(); i++)
 	{
-		// if onlyAvaible is activated, will only print if its avaiable, if not, prints anyway
-		if (!onlyAvaiable || this->packList.at(i).isAvaiable())
+		// if onlyAvaible is activated, will only print if its available, if not, prints anyway
+		if (!onlyAvailable || this->packList.at(i).isAvailable())
 		{
 			if (count == 0)
 			{
@@ -481,11 +481,11 @@ void Agency::printPacks(const bool onlyAvaiable) const
 	}
 	if (count == 0)
 		// In this case, if there are no packs, it will enter the condition at the start
-		cout << "No avaiable packs found" << endl;
+		cout << "No available packs found" << endl;
 
 }
 
-void Agency::printPacksByDestination(const string & s, const bool onlyAvaiable) const
+void Agency::printPacksByDestination(const string & s, const bool onlyAvailable) const
 {
 	string sl = s, aux;
 	cu::strTrim(sl);
@@ -508,8 +508,8 @@ void Agency::printPacksByDestination(const string & s, const bool onlyAvaiable) 
 			cu::strLower(aux);
 			if (aux.find(sl) != string::npos)
 			{
-				// if onlyAvaible is activated, will only print if its avaiable, if not, prints anyway
-				if (!onlyAvaiable || this->packList.at(i).isAvaiable())
+				// if onlyAvaible is activated, will only print if its available, if not, prints anyway
+				if (!onlyAvailable || this->packList.at(i).isAvailable())
 				{
 					if (count == 0)
 					{
@@ -524,21 +524,21 @@ void Agency::printPacksByDestination(const string & s, const bool onlyAvaiable) 
 				}
 
 				// If it finds one match, it doesn't need to check the remaining locations
-				break; 
+				break;
 			}
 		}
 	}
 	if (count == 0)
 	{
-		if (onlyAvaiable)
-			cout << "No avaiable packs matching the location \"" << s << "\"" << endl;
+		if (onlyAvailable)
+			cout << "No available packs matching the location \"" << s << "\"" << endl;
 		else
 			cout << "No packs matching the location \"" << s << "\"" << endl;
 	}
-		
+
 }
 
-void Agency::printPacksByDate(const Date & start, const Date & end, const bool onlyAvaiable) const
+void Agency::printPacksByDate(const Date & start, const Date & end, const bool onlyAvailable) const
 {
 	cout << endl;
 
@@ -551,8 +551,8 @@ void Agency::printPacksByDate(const Date & start, const Date & end, const bool o
 	int count = 0;
 	for (size_t i = 0; i < this->packList.size(); i++)
 	{
-		// if onlyAvaible is activated, will only check if its avaiable, if not, checks anyway
-		if (!onlyAvaiable || this->packList.at(i).isAvaiable())
+		// if onlyAvaible is activated, will only check if its available, if not, checks anyway
+		if (!onlyAvailable || this->packList.at(i).isAvailable())
 		{
 			if (start <= this->packList.at(i).getDeparture()
 				&& end >= this->packList.at(i).getReturn())
@@ -572,15 +572,15 @@ void Agency::printPacksByDate(const Date & start, const Date & end, const bool o
 	}
 	if (count == 0)
 	{
-		if (onlyAvaiable)
-			cout << "No avaiable packs during the interval " << start << " to " << end << endl;
+		if (onlyAvailable)
+			cout << "No available packs during the interval " << start << " to " << end << endl;
 		else
 			cout << "No packs during the interval " << start << " to " << end << endl;
 	}
-		
+
 }
 
-void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, const Date& end, const bool onlyAvaiable) const
+void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, const Date& end, const bool onlyAvailable) const
 {
 	string sl = s, aux;
 	cu::strTrim(sl);
@@ -597,17 +597,17 @@ void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, 
 	int count = 0;
 	for (size_t i = 0; i < this->packList.size(); i++)
 	{
-		// If onlyAvaible is activated, will only print if its avaiable, if not, prints anyway
+		// If onlyAvaible is activated, will only print if its available, if not, prints anyway
 		// Also immediatly checks if the it's in the given Dates range
-		if ((!onlyAvaiable || this->packList.at(i).isAvaiable())
+		if ((!onlyAvailable || this->packList.at(i).isAvailable())
 			&& (start <= this->packList.at(i).getDeparture()
-			&& end >= this->packList.at(i).getReturn()))
+				&& end >= this->packList.at(i).getReturn()))
 		{
 			for (size_t j = 0; j < this->packList.at(i).getDestinationsSize(); j++)
 			{
 				aux = this->packList.at(i).getDestinationAt(j);
 				cu::strLower(aux);
-			
+
 				if (sl.find(aux) != string::npos)
 				{
 					if (count == 0)
@@ -630,24 +630,12 @@ void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, 
 
 	if (count == 0)
 	{
-		if (onlyAvaiable)
-			cout << "No avaiable packs matching the location \"" << s << "\"" << endl;
+		if (onlyAvailable)
+			cout << "No available packs matching the location \"" << s << "\"" << endl;
 		else
 			cout << "No packs matching the location \"" << s << "\"" << endl;
 	}
 }
-
-
-// FILE OUTPUT METHODS
-
-void Agency::saveData() const
-{
-	printAllClientsToFile();
-	printAllPacksToFile();
-	return;
-}
-
-// OTHER PUBLIC METHODS
 
 void Agency::printStatistics() const {
 
@@ -669,13 +657,13 @@ void Agency::printMostVisitedDestinations(int n) const {
 	multimap<int, string> reversedPackMap;
 
 	// create a map of a place and the number of times it was visited by all clients
-	for (size_t i = 0; i < this->clientList.size(); i++) { 
+	for (size_t i = 0; i < this->clientList.size(); i++) {
 
-		for (size_t j = 0; j < this->clientList.at(i).getTravelPacksList().size(); j++) { 
+		for (size_t j = 0; j < this->clientList.at(i).getTravelPacksList().size(); j++) {
 
 			for (size_t k = 0; k < packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationsSize(); k++) {
-				
-				if (packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationsSize() > 1 && k==0)
+
+				if (packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationsSize() > 1 && k == 0)
 					continue;
 
 				if (packMap.find(packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)) == packMap.end())
@@ -688,16 +676,101 @@ void Agency::printMostVisitedDestinations(int n) const {
 	}
 
 	// change the key and value of packMap in order to order by the number of visits
-	for (auto& iter: packMap)
+	for (auto& iter : packMap)
 		reversedPackMap.insert(pair <int, string>(iter.second, iter.first));
 
 	for (auto iter = reversedPackMap.rbegin(); iter != reversedPackMap.rend(); ++iter) {
 		cout << '\t' << auxInt << ". " << iter->second;
-		cout << " (Total Visits: " <<  iter->first << ")\n\n";
+		cout << " (Total Visits: " << iter->first << ")\n\n";
 		auxInt++;
 
 		if (n + 1 == auxInt) break;
 	}
+}
+
+// FILE OUTPUT METHODS
+
+void Agency::saveData() const
+{
+	printAllClientsToFile();
+	printAllPacksToFile();
+	return;
+}
+
+// OTHER PUBLIC METHODS
+
+bool Agency::purchasePack(int vat, const int id) {
+
+	int tickets = -1;
+	bool packFound = false;
+	
+	if (!isVatUsed(vat))
+	{
+		cout << "Client with VAT " << vat << " not found" << endl;
+		return false;
+	}
+
+	for (size_t i = 0; i < this->packList.size(); i++) {
+		if (abs(this->packList.at(i).getId()) == id) {
+			packFound = true;
+			break;
+		}
+	}
+
+	if (!packFound) {
+		cout << "Pack with ID " << id << " not found..." << endl;
+		return false;
+	}
+
+	if (!packWithId(id).isAvailable()) { 
+		cout << "Pack with ID " << id << " is unavailable..." << endl;
+		return false;
+	}
+
+	cout << "Tickets available for this pack: " << packWithId(id).getMaxBookings() - packWithId(id).getCurrentBookings() << endl << endl;
+
+	while (cu::readInt(tickets, "Number of tickets")) {
+		if (tickets > 0 && tickets + packWithId(id).getCurrentBookings() <= packWithId(id).getMaxBookings())
+			break;
+		else
+			cout << "Invalid number of tickets..." << endl;
+	}
+
+	if (tickets == -1)  // In case user inserts ^Z in above question
+		return false;
+
+	// update pack info
+	for (size_t i = 0; i < this->packList.size(); i++) {
+
+		if (this->packList.at(i).getId() == id) {
+			this->packList.at(i).setCurrentBookings(this->packList.at(i).getCurrentBookings() + tickets);
+			if (this->packList.at(i).getCurrentBookings() == this->packList.at(i).getMaxBookings()) {
+				this->packList.at(i).makeUnavailable();
+				cout << "This pack is now unavailable" << endl;
+			}
+			break;
+		}	
+	}
+
+	// update client info
+	for (size_t j = 0; j < this->clientList.size(); j++) {
+
+		if (this->clientList.at(j).getVAT() == vat) {
+
+			vector<int> clientPackListCopy = this->clientList.at(j).getTravelPacksList();
+			this->clientList.at(j).setTotalSpent(this->clientList.at(j).getTotalSpent() + packWithId(id).getPrice()*tickets); 
+			
+			for (int k = 0; k < tickets; k++) {
+				clientPackListCopy.push_back(id);
+			}
+
+			this->clientList.at(j).setTravelPacksList(clientPackListCopy);
+			break;
+		}
+	}
+	cout << "Successful purchase operation" << endl;
+
+	return true;
 }
 
 bool Agency::removeClient()
@@ -767,7 +840,7 @@ bool Agency::removeClient()
 	default:
 		break;
 	}
-	
+
 	return false; // If it somehow gets here, something went wrong
 }
 
@@ -836,7 +909,7 @@ bool Agency::changeClient(const unsigned vat) {
 		return false;
 	}
 
-	cout << "Client changed sucessful" << endl;
+	cout << "Client changed successfully" << endl;
 	cu::pauseConsole();
 
 	return true;
@@ -1164,7 +1237,7 @@ bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned & 
 
 	fin.ignore(1000, '\n');
 
-	pack.updateAvaiability();
+	pack.updateAvailability();
 
 	return true;
 }

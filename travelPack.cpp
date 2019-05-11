@@ -137,10 +137,10 @@ void TravelPack::printSummary()
 	cout << "       Departure: " << this->departureDate << endl;
 	cout << "          Return: " << this->returnDate << endl;
 	cout << "           Price: " << this->price << endl;
-	cout << "Avaiable tickets: " << (this->maxBookings - this->currentBookings) << endl;
+	cout << "Available tickets: " << (this->maxBookings - this->currentBookings) << endl;
 }
 
-bool TravelPack::isAvaiable() const
+bool TravelPack::isAvailable() const
 {
 	if (this->id >= 1)
 		return true;
@@ -148,21 +148,21 @@ bool TravelPack::isAvaiable() const
 		return false;
 }
 
-void TravelPack::makeAvaiable()
+void TravelPack::makeAvailable()
 {
 	this->id = abs(this->id);
 }
 
-void TravelPack::makeUnavaiable()
+void TravelPack::makeUnavailable()
 {
 	this->id = -abs(this->id);
 }
 
-void TravelPack::updateAvaiability()
+void TravelPack::updateAvailability()
 {
 	Date now = Date().now();
 	if (this->departureDate < now || this->currentBookings >= this->maxBookings)
-		this->makeUnavaiable();
+		this->makeUnavailable();
 }
 
 std::ostream& operator<<(std::ostream& stream, const TravelPack& pack)

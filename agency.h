@@ -107,22 +107,22 @@ public:
 	/**
 		Prints all packs to the screen in a formatted form
 	*/
-	void printPacks(const bool onlyAvaiable) const;
+	void printPacks(const bool onlyAvailable) const;
 
 	/**
 		Prints all packs matching a given destination to the screen in a formatted form
 	*/
-	void printPacksByDestination(const std::string & s, const bool onlyAvaiable) const;
+	void printPacksByDestination(const std::string & s, const bool onlyAvailable) const;
 
 	/**
 		Prints all packs matching a given Date interval to the screen in a formatted form
 	*/
-	void printPacksByDate(const Date & start, const Date & end, const bool onlyAvaiable) const;
+	void printPacksByDate(const Date & start, const Date & end, const bool onlyAvailable) const;
 
 	/**
 		Prints all packs matching a given destination and Date interval to the screen in a formatted form
 	*/
-	void printPacksByDestinationAndDate(const std::string & s, const Date & start, const Date & end, const bool onlyAvaiable) const;
+	void printPacksByDestinationAndDate(const std::string & s, const Date & start, const Date & end, const bool onlyAvailable) const;
 
 	/**
 		Prints the statistics of agency
@@ -140,6 +140,11 @@ public:
 		Saves all the Agency data to the files specified in the object
 	*/
 	void saveData() const;
+
+	/**
+		Sell a pack by the given VAT and pack ID
+	*/
+	bool purchasePack(int vat, const int id);
 
 	/**
 		Remove a Client by inserting a vat or choosing from a list of clients

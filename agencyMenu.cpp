@@ -66,7 +66,7 @@ void viewPacks(const Agency & agency)
 
 	while (!back)
 	{
-		cout << "--------  View Avaiable Packs  --------" << endl << endl;
+		cout << "--------  View Available Packs  --------" << endl << endl;
 		printMenu({ "Previous Menu", // 0
 			"All", // 1
 			"Sort by Destination", // 2
@@ -90,7 +90,7 @@ void viewPacks(const Agency & agency)
 			cu::pauseConsole();
 			break;
 		case 2:
-			cout << "All avaiable Packs sorted by Destination:" << endl;
+			cout << "All available Packs sorted by Destination:" << endl;
 
 			cu::readStr(s, "Destination to search");
 
@@ -100,7 +100,7 @@ void viewPacks(const Agency & agency)
 			cu::pauseConsole();
 			break;
 		case 3:
-			cout << "All avaiable Packs sorted by Date" << endl;
+			cout << "All available Packs sorted by Date" << endl;
 
 			cout << "Date Interval to sort by:" << endl;
 			cout << "Starting Date:" << endl;
@@ -119,7 +119,7 @@ void viewPacks(const Agency & agency)
 			cu::pauseConsole();
 			break;
 		case 4:
-			cout << "All avaiable Packs sorted by Destination and Date:" << endl;
+			cout << "All available Packs sorted by Destination and Date:" << endl;
 
 			cu::readStr(s, "Destination to search");
 
@@ -160,7 +160,7 @@ void viewClients(const Agency & agency)
 		cout << "--------  View Clients  --------" << endl << endl;
 		printMenu({ "Previous Menu", // 0
 			"All", // 1
-			"Specific Client"}); // 2
+			"Specific Client" }); // 2
 
 		if (!cu::readInt(op, "Select Option"))
 			return;
@@ -206,7 +206,7 @@ void manageClients(Agency & agency)
 		printMenu({ "Previous Menu", // 0
 			"Add new Client", // 1
 			"Change Client", // 2
-			"Remove Client"}); // 3
+			"Remove Client" }); // 3
 
 		if (!cu::readInt(op, "Select Option"))
 			return;
@@ -265,7 +265,7 @@ void managePacks(Agency & agency)
 		printMenu({ "Previous Menu", // 0
 			"Add new Pack", // 1
 			"Change Pack", // 2
-			"Make Pack Unavaiable" }); // 3
+			"Make Pack Unavailable" }); // 3
 
 		if (!cu::readInt(op, "Select Option"))
 			return;
@@ -322,7 +322,6 @@ void printAgencyStatistics(Agency & agency)
 	return;
 }
 
-
 void agencyMainMenu(Agency & agency)
 {
 	bool stopProgram = false;
@@ -339,11 +338,11 @@ void agencyMainMenu(Agency & agency)
 			"Manage Clients", // 2
 			"Manage Packs", // 3
 			"View Clients", // 4
-			"View Avaiable Packs", // 5
+			"View Available Packs", // 5
 			"View Packs sold to a specific Client", // 6
 			"Purchase a pack", // 7
 			"View Sales Statistics", // 8
-			"Most Visited Destinations"}); // 9
+			"Most Visited Destinations" }); // 9
 
 		cout << "At any point enter Ctrl+Z to cancel or to go back to a previous menu\n" << endl;
 
