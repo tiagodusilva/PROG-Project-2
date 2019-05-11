@@ -1,5 +1,6 @@
 #include "agency.h"
 #include "customUtilities.h"
+#include <iomanip>
 
 using namespace std;
 
@@ -33,12 +34,22 @@ string Agency::getURL() const {
 	return this->url;
 }
 
-vector<Client> Agency::getClients() const {
+vector<Client> Agency::getClientList() const {
 	return this->clientList;
 }
 
-vector<TravelPack> Agency::getPacksList() const {
+size_t Agency::getClientListSize() const
+{
+	return this->clientList.size();
+}
+
+vector<TravelPack> Agency::getPackList() const {
 	return this->packList;
+}
+
+size_t Agency::getPackListSize() const
+{
+	return this->packList.size();
 }
 
 string Agency::getFileNameClients() const {
@@ -344,7 +355,9 @@ bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker)
 
 // CONSOLE OUTPUT METHODS
 
-void Agency::printClientByVAT(unsigned vat) const {
+void Agency::printClientByVAT(unsigned vat) const
+{
+	cout << endl;
 
 	if (this->clientList.empty()) {
 		cout << "No registered clients" << endl;
@@ -364,6 +377,8 @@ void Agency::printClientByVAT(unsigned vat) const {
 
 void Agency::printClients() const
 {
+	cout << endl;
+
 	if (this->clientList.empty())
 	{
 		cout << "No registered clients" << endl;
@@ -378,8 +393,68 @@ void Agency::printClients() const
 	}
 }
 
+void Agency::printClientList() const
+{
+	for (size_t j = 0; j < this->clientList.size(); j++) {
+		cout << j + 1 << ". " << left << setw(30) << this->clientList.at(j).getName() << right << "    VAT: "
+			<< this->clientList.at(j).getVAT() << endl;
+	}
+}
+
+void Agency::printPacksByClient(const int vat) const
+{
+	cout << endl;
+
+	if (this->clientList.empty()) {
+		cout << "No registered clients" << endl;
+		return;
+	}
+	if (this->packList.empty()) {
+		cout << "No registered packs" << endl;
+		return;
+	}
+
+	// Look for the client
+	for (size_t i = 0; i < this->clientList.size(); i++)
+	{
+		if (this->clientList.at(i).getVAT() == vat)
+		{
+			// Loop through all of its TravelPacks
+			for (size_t j = 0; j < this->clientList.at(i).getTravelPacksListSize(); j++)
+			{
+				int pack = this->clientList.at(i).getTravelPackAt(j);
+				// Print pack with this ID
+				this->printPackById(pack);
+			}
+			return;
+		}
+	}
+
+	cout << "Client with VAT \"" << vat << "\" not found" << endl;	
+}
+
+void Agency::printPackById(const int id) const
+{
+	cout << endl;
+
+	int aux = abs(id);
+	for (size_t i = 0; i < this->packList.size(); i++)
+	{
+		if (abs(this->packList.at(i).getId()) == aux)
+		{
+			cout << this->packList.at(i) << endl;
+			return;
+		}
+	}
+
+	cout << "Pack with id \"" << id << "\" not found" << endl;
+}
+
 void Agency::printPacks(const bool onlyAvaiable) const
 {
+
+	cout << endl;
+
 	if (this->packList.size() == 0)
 	{
 		cout << "No registered packs" << endl;
@@ -415,6 +490,9 @@ void Agency::printPacksByDestination(const string & s, const bool onlyAvaiable) 
 	string sl = s, aux;
 	cu::strTrim(sl);
 	cu::strLower(sl);
+
+	cout << endl;
+
 	if (this->packList.size() == 0)
 	{
 		cout << "No registered packs" << endl;
@@ -462,6 +540,8 @@ void Agency::printPacksByDestination(const string & s, const bool onlyAvaiable) 
 
 void Agency::printPacksByDate(const Date & start, const Date & end, const bool onlyAvaiable) const
 {
+	cout << endl;
+
 	if (this->packList.size() == 0)
 	{
 		cout << "No registered packs" << endl;
@@ -505,6 +585,9 @@ void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, 
 	string sl = s, aux;
 	cu::strTrim(sl);
 	cu::strLower(sl);
+
+	cout << endl;
+
 	if (this->packList.size() == 0)
 	{
 		cout << "No registered packs" << endl;
@@ -619,7 +702,6 @@ void Agency::printMostVisitedDestinations(int n) const {
 
 bool Agency::removeClient()
 {
-
 	int vat;
 	int option = 0;
 
@@ -628,18 +710,34 @@ bool Agency::removeClient()
 		return false;
 	}
 
+	cout << "--------  Remove Client  --------" << endl << endl;
 	cout << "1. Remove by VAT number" << endl
-		<< "2. Select from client list" << endl;
+		<< "2. Select from client list" << endl
+		<< "0. Previous Menu" << endl << endl;
 
 	while (true) {
-		cu::readInt(option, "Option");
-		if (option >= 1 && option <= 2) break;
+		if (!cu::readInt(option, "Option"))
+		{
+			cout << "Operation Aborted" << endl;
+			cu::pauseConsole();
+			return false;
+		}
+		if (option >= 0 && option <= 2) break;
 		else cout << "Not a valid option!" << endl;
 	}
 
-	if (option == 1) {
+	switch (option)
+	{
+	case 0:
+		return false;
+		break; // Safety break ;D
+	case 1:
 		while (true) {
-			cu::readInt(vat, "VAT number");
+			if (!cu::readInt(vat, "VAT number"))
+			{
+				cout << "Operation Aborted" << endl;
+				return false;
+			}
 			for (size_t i = 0; i < this->clientList.size(); i++) {
 				if (this->clientList.at(i).getVAT() == vat) {
 					this->clientList.erase(this->clientList.begin() + i);
@@ -649,32 +747,36 @@ bool Agency::removeClient()
 			}
 			cout << "Client not found" << endl;
 		}
-	}
-	else {
-		for (size_t j = 0; j < this->clientList.size(); j++) {
-			cout << j + 1 << "." << this->clientList.at(j).getName() << " - VAT :"
-				<< this->clientList.at(j).getVAT() << endl;
-		}
+		break;
+	case 2:
+		this->printClientList();
 
 		while (true) {
-			cu::readInt(option, "Option");
-			if (1 <= option && option <= (int) (this->clientList.size() + 1)) break;
+			if (!cu::readInt(option, "Option"))
+			{
+				cout << "Operation aborted" << endl;
+				return false;
+			}
+			if (1 <= option && option <= (int)(this->clientList.size() + 1)) break;
 			else cout << "Not a valid option!" << endl;
 		}
 		this->clientList.erase(this->clientList.begin() + option - 1);
 		cout << "Client removed" << endl;
 		return true;
-
+		break;
+	default:
+		break;
 	}
-	return true;
+	
+	return false; // If it somehow gets here, something went wrong
 }
 
-bool Agency::changeClient(unsigned vat) {
+bool Agency::changeClient(const unsigned vat) {
 	int i, num;
 	string str;
 	Address auxAddress;
 
-	if (this->clientList.size() == 0) {
+	if (this->clientList.empty()) {
 		cout << "No clients to be changed" << endl;
 		return false;
 	}
@@ -689,29 +791,40 @@ bool Agency::changeClient(unsigned vat) {
 		}
 	}
 
-	cout << "1. Name" << endl << "2. VAT" << endl << "3. Household" << endl
-		<< "4. Address" << endl << "0. Cancel" << endl;
+	while (true)
+	{
+		system("cls");
+		cout << "  Possible fields to change" << endl;
+		cout << "\t1. Name" << endl << "\t2. VAT" << endl << "\t3. Household" << endl
+			<< "\t4. Address" << endl << "\t0. Cancel" << endl;
 
-	while (true) {
-		cu::readInt(num, "What do you want to change");
-		if (num >= 0 && num <= 4) break;
-		else cout << "Not a valid option!" << endl;
+		if (!cu::readInt(num, "What do you want to change"))
+			return false;
+		if (num >= 0 && num <= 4)
+			break;
+		else
+		{
+			cout << "Not a valid option!" << endl;
+			cu::pauseConsole();
+		}
 	}
+
+	system("cls");
 
 	switch (num)
 	{
 	case 1:
-		cu::readStr(str, "Name");
+		cu::readStr(str, "New Name");
 		clientList.at(i).setName(str); break;
 	case 2:
 		while (true) {
-			cu::readInt(num, "VAT");
+			cu::readInt(num, "New VAT");
 			if (!isVatUsed(num)) break;
 		}
 		clientList.at(i).setVAT(num, this->clientList); break;
 	case 3:
 		while (true) {
-			cu::readInt(num, "Household");
+			cu::readInt(num, "New Household");
 			if (num >= 1) break;
 			cout << "Insert a valid household number" << endl;
 		}
@@ -724,6 +837,148 @@ bool Agency::changeClient(unsigned vat) {
 	}
 
 	cout << "Client changed sucessful" << endl;
+	cu::pauseConsole();
+
+	return true;
+}
+
+bool Agency::changePack(const int id)
+{
+	int absId = abs(id);
+	if (this->packList.empty())
+	{
+		cout << "There are no packs to change" << endl;
+		return false;
+	}
+
+	TravelPack* pack = nullptr;
+	for (size_t i = 0; i < this->packList.size(); i++)
+	{
+		if (abs(this->packList.at(i).getId()) == absId)
+		{
+			pack = &this->packList.at(i);
+			break;
+		}
+	}
+
+	if (pack == nullptr)
+	{
+		cout << "Pack with id \"" << id << "\" not found" << endl;
+		return false;
+	}
+
+	// At this point, the pack has been found
+
+	int aux;
+	while (true)
+	{
+		system("cls");
+		cout << "  Possible fields to change" << endl;
+		cout << "\t1. Destinations" << endl << "\t2. Departure Date" << endl << "\t3. Return Date" << endl
+			<< "\t4. Price" << endl << "\t5. Maximum Bookings" << endl << "\t0. Cancel" << endl;
+
+		if (!cu::readInt(aux, "What do you want to change"))
+			return false;
+		if (aux >= 0 && aux <= 5)
+			break;
+		else
+		{
+			cout << "Not a valid option!" << endl;
+			cu::pauseConsole();
+		}
+	}
+
+	system("cls");
+
+	Date aDate;
+	string s;
+	vector<string> destinations;
+	char c = 'o';
+
+	switch (aux)
+	{
+	case '0':
+		return false;
+		break; // Safety break ;D
+	case '1': // Destinations
+		cout << "New Destinations" << endl;
+		if (!cu::readStr(s, "Main destination"))
+			return false;
+		destinations.push_back(s);
+
+		if (!cu::readConfirmation(c, "Insert secondary destinations"))
+			return false;
+
+		if (c == 'y' || c == 'Y')
+		{
+			cout << "Write \"stop\" to finish inputting secondary destinations" << endl;
+			do
+			{
+				if (!cu::readStr(s, "Destinations"))
+					return false;
+				destinations.push_back(s);
+			} while (s != "stop");
+			destinations.pop_back(); // Removes the extra "stop"
+		}
+		if (!pack->setDestinations(destinations))
+			return false; // Extra safety, should never return false
+		break;
+	case '2': // Departure Date
+		while (true)
+		{
+			cout << "New departure Date:" << endl;
+			if (!aDate.readUserInput())
+				return false;
+			if (pack->setDeparture(aDate))
+				break;
+		}
+		break;
+	case '3': // Return Date
+		while (true)
+		{
+			cout << "New return Date:" << endl;
+			if (!aDate.readUserInput())
+				return false;
+			if (pack->setReturn(aDate))
+				break;
+		}
+		break;
+	case '4': // Price
+		while (true)
+		{
+			if (!cu::readInt(aux, "New Maximum Bookings"))
+				return false;
+			if (pack->setMaxBookings(aux))
+				break;
+		}
+		// Now to update ALL the client's totalSpent...
+		for (size_t i = 0; i < this->clientList.size(); i++)
+		{
+			Client* clientPtr = &this->clientList.at(i);
+			for (size_t j = 0; j < clientPtr->getTravelPacksListSize(); j++)
+			{
+				if (abs(clientPtr->getTravelPackAt(j)) == absId)
+				{
+					clientPtr->setTotalSpent(clientPtr->getTotalSpent() - pack->getPrice());
+				}
+			}
+		}
+		break;
+	case '5': // Max Bookings
+		while (true)
+		{
+			if (!cu::readInt(aux, "New Maximum Bookings"))
+				return false;
+			if (pack->setMaxBookings(aux))
+				break;
+		}
+		break;
+	default:
+		break;
+	}
+
+	cout << "Pack changed successfully" << endl;
+	cu::pauseConsole();
 
 	return true;
 }

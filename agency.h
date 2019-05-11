@@ -25,8 +25,10 @@ public:
 	unsigned getVAT() const;
 	Address getAddress() const;
 	std::string getURL() const;
-	std::vector<Client> getClients() const;
-	std::vector<TravelPack> getPacksList() const;
+	std::vector<Client> getClientList() const;
+	size_t getClientListSize() const;
+	std::vector<TravelPack> getPackList() const;
+	size_t getPackListSize() const;
 	std::string getFileNameClients() const;
 	std::string getFileNamePacks() const;
 
@@ -86,6 +88,18 @@ public:
 	void printClients() const;
 
 	/**
+		Prints all clients in a short, numbered list, from 1 to n
+	*/
+	void printClientList() const;
+
+	/**
+		Prints all the packs a Client has bought
+	*/
+	void printPacksByClient(const int vat) const;
+
+	void printPackById(const int) const;
+
+	/**
 		Prints a client with a given vat to the screen
 	*/
 	void printClientByVAT(unsigned vat) const;
@@ -136,6 +150,11 @@ public:
 		Change a Client by a given vat
 	*/
 	bool changeClient(unsigned vat);
+
+	/*
+		Change a pack by a given id
+	*/
+	bool changePack(const int id);
 
 	/**
 		Returns true if a given VAT is already registered to a Client
