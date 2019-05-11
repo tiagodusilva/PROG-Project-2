@@ -47,7 +47,7 @@ bool verifyVAT(unsigned int vat, vector<Client> clients) {
 	return true;
 }
 
-//    GET METHODS
+#pragma region GETTERS
 
 string Client::getName() const {
 	return name;
@@ -86,7 +86,9 @@ unsigned Client::getTotalSpent() const {
 	return totalSpent;
 }
 
-//    SET METHODS
+#pragma endregion
+
+#pragma region SETTERS
 
 bool Client::setName(string new_name) {
 	if (new_name.empty()) return false;
@@ -127,6 +129,14 @@ bool Client::setTotalSpent(unsigned new_totalSpent) {
 	return true;
 }
 
+#pragma endregion
+
+// OTHER PUBLIC METHODS
+void Client::printSummary() const
+{
+	cout << left << setw(30) << this->name << right
+		<< "    VAT: " << this->vat;
+}
 
 // OUTPUT STREAM OPERATOR OVERRIDES
 
