@@ -25,6 +25,10 @@ public:
 	Address getAddress() const;
 	std::vector<int> getTravelPacksList() const;
 	size_t getTravelPacksListSize() const;
+	/**
+		If index is out of range, returns 0
+	*/
+	int getTravelPackAt(int index) const;
 	unsigned getTotalSpent() const;
 
 	// SET methods

@@ -74,6 +74,14 @@ size_t Client::getTravelPacksListSize() const
 	return this->travelPacks.size();
 }
 
+int Client::getTravelPackAt(int index) const
+{
+	if (index >= (int) this->travelPacks.size())
+		return 0;
+	else
+		return this->travelPacks.at(index);
+}
+
 unsigned Client::getTotalSpent() const {
 	return totalSpent;
 }
