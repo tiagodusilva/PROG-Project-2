@@ -1,6 +1,8 @@
 #include "agency.h"
 #include "customUtilities.h"
 #include <iomanip>
+#include <map>
+#include <set>
 
 using namespace std;
 
@@ -50,6 +52,21 @@ vector<TravelPack> Agency::getPackList() const {
 size_t Agency::getPackListSize() const
 {
 	return this->packList.size();
+}
+
+TravelPack Agency::getPackWithId(const int id) const {
+	for (size_t i = 0; i < this->packList.size(); i++) {
+		if (abs(this->packList.at(i).getId()) == id)
+			return this->packList.at(i);
+	}
+	return {};
+}
+
+bool Agency::getAvaiabilityOfPackAtIndex(const int index)
+{
+	if (index >= (int) this->packList.size())
+		return false;
+	return this->packList.at(index).isAvaiable();
 }
 
 string Agency::getFileNameClients() const {
@@ -395,9 +412,11 @@ void Agency::printClients() const
 
 void Agency::printClientList() const
 {
-	for (size_t j = 0; j < this->clientList.size(); j++) {
-		cout << j + 1 << ". " << left << setw(30) << this->clientList.at(j).getName() << right << "    VAT: "
-			<< this->clientList.at(j).getVAT() << endl;
+	for (size_t i = 0; i < this->clientList.size(); i++)
+	{
+		cout << i << " .";
+		this->clientList.at(i).printSummary();
+		cout << endl;
 	}
 }
 
@@ -414,17 +433,39 @@ void Agency::printPacksByClient(const int vat) const
 		return;
 	}
 
+	set<int> printedPacks = {};
+	int count = 0;
+
 	// Look for the client
 	for (size_t i = 0; i < this->clientList.size(); i++)
 	{
 		if (this->clientList.at(i).getVAT() == vat)
 		{
+			if (this->clientList.at(i).getTravelPacksListSize() == 0)
+			{
+				cout << "No packs registered to this Client" << endl;
+				return;
+			}
+
 			// Loop through all of its TravelPacks
 			for (size_t j = 0; j < this->clientList.at(i).getTravelPacksListSize(); j++)
 			{
 				int pack = this->clientList.at(i).getTravelPackAt(j);
-				// Print pack with this ID
-				this->printPackById(pack);
+				if (printedPacks.find(pack) == printedPacks.end())
+				{
+					// Set doesn't have this pack
+					printedPacks.insert(pack);
+					// Print pack with this ID
+					if (count == 0)
+					{
+						this->printPackById(pack);
+					}
+					else
+					{
+						cout << PACK_OUTPUT_SEPARATOR << endl;
+						this->printPackById(pack);
+					}
+				}
 			}
 			return;
 		}
@@ -597,7 +638,7 @@ void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, 
 	int count = 0;
 	for (size_t i = 0; i < this->packList.size(); i++)
 	{
-		// If onlyAvaible is activated, will only print if its available, if not, prints anyway
+		// If onlyAvailable is activated, will only print if its available, if not, prints anyway
 		// Also immediatly checks if the it's in the given Dates range
 		if ((!onlyAvailable || this->packList.at(i).isAvailable())
 			&& (start <= this->packList.at(i).getDeparture()
@@ -661,16 +702,16 @@ void Agency::printMostVisitedDestinations(int n) const {
 
 		for (size_t j = 0; j < this->clientList.at(i).getTravelPacksList().size(); j++) {
 
-			for (size_t k = 0; k < packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationsSize(); k++) {
-
-				if (packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationsSize() > 1 && k == 0)
+			for (size_t k = 0; k < this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationsSize(); k++) {
+				
+				if (this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationsSize() > 1 && k==0)
 					continue;
 
-				if (packMap.find(packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)) == packMap.end())
-					packMap[packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)] = 1;
+				if (packMap.find(this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)) == packMap.end())
+					packMap[this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)] = 1;
 
 				else
-					packMap[packWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)] += 1;
+					packMap[this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)] += 1;
 			}
 		}
 	}
@@ -773,75 +814,85 @@ bool Agency::purchasePack(int vat, const int id) {
 	return true;
 }
 
-bool Agency::removeClient()
+bool Agency::removeClientByVat(const int vat)
 {
-	int vat;
-	int option = 0;
-
-	if (this->clientList.size() == 0) {
-		cout << "No clients to be removed" << endl;
-		return false;
-	}
-
-	cout << "--------  Remove Client  --------" << endl << endl;
-	cout << "1. Remove by VAT number" << endl
-		<< "2. Select from client list" << endl
-		<< "0. Previous Menu" << endl << endl;
-
-	while (true) {
-		if (!cu::readInt(option, "Option"))
-		{
-			cout << "Operation Aborted" << endl;
-			cu::pauseConsole();
-			return false;
-		}
-		if (option >= 0 && option <= 2) break;
-		else cout << "Not a valid option!" << endl;
-	}
-
-	switch (option)
+	if (this->clientList.empty())
 	{
-	case 0:
+		cout << "No Clients to be removed" << endl;
 		return false;
-		break; // Safety break ;D
-	case 1:
-		while (true) {
-			if (!cu::readInt(vat, "VAT number"))
-			{
-				cout << "Operation Aborted" << endl;
-				return false;
-			}
-			for (size_t i = 0; i < this->clientList.size(); i++) {
-				if (this->clientList.at(i).getVAT() == vat) {
-					this->clientList.erase(this->clientList.begin() + i);
-					cout << "Client removed" << endl;
-					return true;
-				}
-			}
-			cout << "Client not found" << endl;
-		}
-		break;
-	case 2:
-		this->printClientList();
-
-		while (true) {
-			if (!cu::readInt(option, "Option"))
-			{
-				cout << "Operation aborted" << endl;
-				return false;
-			}
-			if (1 <= option && option <= (int)(this->clientList.size() + 1)) break;
-			else cout << "Not a valid option!" << endl;
-		}
-		this->clientList.erase(this->clientList.begin() + option - 1);
-		cout << "Client removed" << endl;
-		return true;
-		break;
-	default:
-		break;
 	}
 
-	return false; // If it somehow gets here, something went wrong
+	for (size_t i = 0; i < this->clientList.size(); i++) {
+		if (this->clientList.at(i).getVAT() == vat) {
+			this->clientList.erase(this->clientList.begin() + i);
+			cout << "Client removed" << endl;
+			return true;
+		}
+	}
+
+	cout << "Client not found" << endl;
+	return false;
+}
+
+bool Agency::removeClientByIndex(const int index)
+{
+	if (this->clientList.empty())
+	{
+		cout << "No Clients to be removed" << endl;
+		return false;
+	}
+
+	if (index >= (int) this->clientList.size())
+	{
+		cout << "Index out of range" << endl;
+		return false;
+	}
+
+	this->clientList.erase(this->clientList.begin() + index);
+
+	cout << "Client removed successfully" << endl;
+	return true;
+}
+
+bool Agency::makePackUnavaiableById(const int id)
+{
+	if (this->clientList.empty())
+	{
+		cout << "No Packs to be removed" << endl;
+		return false;
+	}
+
+	int auxId = abs(id);
+	for (size_t i = 0; i < this->packList.size(); i++) {
+		if (abs(this->packList.at(i).getId()) == auxId) {
+			this->packList.at(i).makeUnavaiable();
+			cout << "Pack is now unavaiable" << endl;
+			return true;
+		}
+	}
+
+	cout << "Pack not found" << endl;
+	return false;
+}
+
+bool Agency::makePackUnavaiableByIndex(const int index)
+{
+	if (this->packList.empty())
+	{
+		cout << "No Packs to be removed" << endl;
+		return false;
+	}
+
+	if (index >= (int) this->packList.size())
+	{
+		cout << "Index out of range" << endl;
+		return false;
+	}
+
+	this->packList.at(index).makeUnavaiable();
+
+	cout << "Pack is now unavaiable" << endl;
+	return true;
 }
 
 bool Agency::changeClient(const unsigned vat) {
@@ -966,6 +1017,7 @@ bool Agency::changePack(const int id)
 	Date aDate;
 	string s;
 	vector<string> destinations;
+	int priceChange;
 	char c = 'o';
 
 	switch (aux)
@@ -982,7 +1034,7 @@ bool Agency::changePack(const int id)
 		if (!cu::readConfirmation(c, "Insert secondary destinations"))
 			return false;
 
-		if (c == 'y' || c == 'Y')
+		if (c == 'y')
 		{
 			cout << "Write \"stop\" to finish inputting secondary destinations" << endl;
 			do
@@ -1017,6 +1069,8 @@ bool Agency::changePack(const int id)
 		}
 		break;
 	case '4': // Price
+
+		priceChange = pack->getPrice();
 		while (true)
 		{
 			if (!cu::readInt(aux, "New Maximum Bookings"))
@@ -1024,18 +1078,32 @@ bool Agency::changePack(const int id)
 			if (pack->setMaxBookings(aux))
 				break;
 		}
-		// Now to update ALL the client's totalSpent...
-		for (size_t i = 0; i < this->clientList.size(); i++)
+
+		if (!cu::readConfirmation(c, "Do you wish to reflect this change in all the Clients' Total Spent"))
+			return false;
+
+		if (c == 'y')
 		{
-			Client* clientPtr = &this->clientList.at(i);
-			for (size_t j = 0; j < clientPtr->getTravelPacksListSize(); j++)
+			// Calculate price difference
+			priceChange = priceChange - aux;
+			// Now to update ALL the client's totalSpent...
+			for (size_t i = 0; i < this->clientList.size(); i++)
 			{
-				if (abs(clientPtr->getTravelPackAt(j)) == absId)
+				Client* clientPtr = &this->clientList.at(i);
+				for (size_t j = 0; j < clientPtr->getTravelPacksListSize(); j++)
 				{
-					clientPtr->setTotalSpent(clientPtr->getTotalSpent() - pack->getPrice());
+					if (abs(clientPtr->getTravelPackAt(j)) == absId)
+					{
+						clientPtr->setTotalSpent(clientPtr->getTotalSpent() - priceChange);
+					}
 				}
 			}
+			cout << "All clients' Total Spent is now updated" << endl;
 		}
+		else
+			cout << "No changes were made to the Clients' Total Spent" << endl;
+
+
 		break;
 	case '5': // Max Bookings
 		while (true)
@@ -1070,14 +1138,6 @@ bool Agency::isVatUsed(unsigned vat) const
 	}
 
 	return foundVat;
-}
-
-TravelPack Agency::packWithId(int id) const {
-	for (size_t i = 0; i < this->packList.size(); i++) {
-		if (abs(this->packList.at(i).getId()) == id)
-			return this->packList.at(i);
-	}
-	return {};
 }
 
 // PRIVATE METHODS

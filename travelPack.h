@@ -41,20 +41,26 @@ public:
 
 	// Other Methods
 
-	void printSummary();
-	friend std::ostream& operator<<(std::ostream& stream, const TravelPack& pack);
-	friend std::ofstream& operator<<(std::ofstream& stream, const TravelPack& pack);
+	void printSummary() const;
+	
 	/*
 		Only checks if the ID is positive or negative
 	*/
+
 	bool isAvailable() const;
 	void makeAvailable();
 	void makeUnavailable();
+
 	/**
 		Never sets packs to available, only to unavailable
 		Checks if the departureDate has already passed and if the capacity is full
 	*/
 	void updateAvailability();
+
+	// OUTPUT STREAM OPERATOR OVERRIDES
+
+	friend std::ostream& operator<<(std::ostream& stream, const TravelPack& pack);
+	friend std::ofstream& operator<<(std::ofstream& stream, const TravelPack& pack);
 
 private:
 	int id;

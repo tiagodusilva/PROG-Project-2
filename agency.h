@@ -7,7 +7,6 @@
 #include <string>
 #include <vector>
 #include <fstream>
-#include <map>
 
 class Client;
 
@@ -29,6 +28,9 @@ public:
 	size_t getClientListSize() const;
 	std::vector<TravelPack> getPackList() const;
 	size_t getPackListSize() const;
+	TravelPack getPackWithId(const int id) const;
+	// Will return false if out of index
+	bool getAvaiabilityOfPackAtIndex(const int index);
 	std::string getFileNameClients() const;
 	std::string getFileNamePacks() const;
 
@@ -88,7 +90,8 @@ public:
 	void printClients() const;
 
 	/**
-		Prints all clients in a short, numbered list, from 1 to n
+		Prints all Clients in a short, numbered list, from 1 to n
+		Prints by order in the vector, so that 1 corresponds to index 0
 	*/
 	void printClientList() const;
 
@@ -97,6 +100,9 @@ public:
 	*/
 	void printPacksByClient(const int vat) const;
 
+	/**
+		Prints the pack with a given ID
+	*/
 	void printPackById(const int) const;
 
 	/**
@@ -148,8 +154,18 @@ public:
 
 	/**
 		Remove a Client by inserting a vat or choosing from a list of clients
+		Remove a Client through its VAT number
 	*/
-	bool removeClient();
+	bool removeClientByVat(const int vat);
+
+	bool removeClientByIndex(const int index);
+
+	/**
+		Makes the pack with the given ID permanently unavaiable
+	*/
+	bool makePackUnavaiableById(const int id);
+
+	bool makePackUnavaiableByIndex(const int index);
 
 	/**
 		Change a Client by a given vat
@@ -165,11 +181,6 @@ public:
 		Returns true if a given VAT is already registered to a Client
 	*/
 	bool isVatUsed(unsigned vat) const;
-
-	/**
-		Returns the TravelPack with the given ID
-	*/
-	TravelPack packWithId(int id) const;
 
 private:
 	int maxPackId;

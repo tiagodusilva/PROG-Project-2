@@ -1,4 +1,6 @@
 #include "agency.h"
+#include "agencyMenu.h"
+#include "customUtilities.h"
 #include <iostream>
 
 using namespace std;
@@ -10,9 +12,6 @@ int main()
 	// Right now reads all the Agency data and prints all packs to the screen
 	Agency agency;
 	agency.loadData("agencyTest.txt", true);
-
-	
-	agency.printPacks(true);
-	agency.saveData();
+	agencyMainMenu(agency);
 
 }
