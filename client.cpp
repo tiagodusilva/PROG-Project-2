@@ -132,6 +132,7 @@ bool Client::setTotalSpent(unsigned new_totalSpent) {
 #pragma endregion
 
 // OTHER PUBLIC METHODS
+
 void Client::printSummary() const
 {
 	cout << left << setw(30) << this->name << right
