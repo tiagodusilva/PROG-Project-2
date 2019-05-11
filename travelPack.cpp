@@ -131,13 +131,13 @@ bool TravelPack::setCurrentBookings(int currentBookings)
 
 #pragma endregion
 
-void TravelPack::printSummary()
+// OTHER PUBLIC METHODS
+
+void TravelPack::printSummary() const
 {
-	cout << "Main destination: " << this->destinations.front() << endl;
-	cout << "       Departure: " << this->departureDate << endl;
-	cout << "          Return: " << this->returnDate << endl;
-	cout << "           Price: " << this->price << endl;
-	cout << "Avaiable tickets: " << (this->maxBookings - this->currentBookings) << endl;
+	cout << left << setw(15) << this->destinations.front() << right
+		<< "    - " << this->departureDate
+		<< " ~ " << this->returnDate;
 }
 
 bool TravelPack::isAvaiable() const
@@ -164,6 +164,8 @@ void TravelPack::updateAvaiability()
 	if (this->departureDate < now || this->currentBookings >= this->maxBookings)
 		this->makeUnavaiable();
 }
+
+// OUTPUT STREAM OPERATOR OVERRIDES
 
 std::ostream& operator<<(std::ostream& stream, const TravelPack& pack)
 {
