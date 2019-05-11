@@ -3,13 +3,6 @@
 
 class Agency;
 
-class AgencyMenu
-{
-public:
-
-private:
-	Agency* agency;
-};
-
+void  agencyMainMenu(Agency & agency);
 
 #endif // AGENCYMENU_H
