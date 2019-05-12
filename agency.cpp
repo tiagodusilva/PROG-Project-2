@@ -528,7 +528,7 @@ void Agency::printPacks(const bool onlyAvailable) const
 
 void Agency::printPacksByDestination(const string & s, const bool onlyAvailable) const
 {
-	string sl = s, aux;
+	string sl = s;
 	cu::strTrim(sl);
 	cu::strLower(sl);
 
@@ -543,29 +543,21 @@ void Agency::printPacksByDestination(const string & s, const bool onlyAvailable)
 	int count = 0;
 	for (size_t i = 0; i < this->packList.size(); i++)
 	{
-		for (size_t j = 0; j < this->packList.at(i).getDestinationsSize(); j++)
+		if (this->packList.at(i).containsDestination(sl))
 		{
-			aux = this->packList.at(i).getDestinationAt(j);
-			cu::strLower(aux);
-			if (aux.find(sl) != string::npos)
+			// if onlyAvaible is activated, will only print if its available, if not, prints anyway
+			if (!onlyAvailable || this->packList.at(i).isAvailable())
 			{
-				// if onlyAvaible is activated, will only print if its available, if not, prints anyway
-				if (!onlyAvailable || this->packList.at(i).isAvailable())
+				if (count == 0)
 				{
-					if (count == 0)
-					{
-						cout << this->packList.at(i) << endl;
-						count++;
-					}
-					else
-					{
-						cout << PACK_OUTPUT_SEPARATOR << endl;
-						cout << this->packList.at(i) << endl;
-					}
+					cout << this->packList.at(i) << endl;
+					count++;
 				}
-
-				// If it finds one match, it doesn't need to check the remaining locations
-				break;
+				else
+				{
+					cout << PACK_OUTPUT_SEPARATOR << endl;
+					cout << this->packList.at(i) << endl;
+				}
 			}
 		}
 	}
@@ -623,7 +615,7 @@ void Agency::printPacksByDate(const Date & start, const Date & end, const bool o
 
 void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, const Date& end, const bool onlyAvailable) const
 {
-	string sl = s, aux;
+	string sl = s;
 	cu::strTrim(sl);
 	cu::strLower(sl);
 
@@ -642,30 +634,19 @@ void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, 
 		// Also immediatly checks if the it's in the given Dates range
 		if ((!onlyAvailable || this->packList.at(i).isAvailable())
 			&& (start <= this->packList.at(i).getDeparture()
-				&& end >= this->packList.at(i).getReturn()))
+			&& end >= this->packList.at(i).getReturn())
+			&& this->packList.at(i).containsDestination(sl))
 		{
-			for (size_t j = 0; j < this->packList.at(i).getDestinationsSize(); j++)
+			if (count == 0)
 			{
-				aux = this->packList.at(i).getDestinationAt(j);
-				cu::strLower(aux);
-
-				if (sl.find(aux) != string::npos)
-				{
-					if (count == 0)
-					{
-						cout << this->packList.at(i) << endl;
-						count++;
-					}
-					else
-					{
-						cout << PACK_OUTPUT_SEPARATOR << endl;
-						cout << this->packList.at(i) << endl;
-					}
-
-					// If it finds a match, it does not need to check the others
-					break;
-				}
-			} // End inner for loop
+				cout << this->packList.at(i) << endl;
+				count++;
+			}
+			else
+			{
+				cout << PACK_OUTPUT_SEPARATOR << endl;
+				cout << this->packList.at(i) << endl;
+			}
 		}
 	} // End outer for loop
 
