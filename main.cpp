@@ -1,17 +1,17 @@
 #include "agency.h"
 #include "agencyMenu.h"
-#include "customUtilities.h"
 #include <iostream>
 
 using namespace std;
 
 int main()
 {
-	// Currently contains random stuff meant for testing
-	
-	// Right now reads all the Agency data and prints all packs to the screen
+	// TODO:
+	// Only missing the "What is the name of the Agency?" part
+	// At a later commit it may go into agencyMainMenu
 	Agency agency;
-	agency.loadData("agencyTest.txt", true);
-	agencyMainMenu(agency);
+	if (agency.loadData("agencyTest.txt", true))
+		agencyMainMenu(agency);
 
+	return 0;
 }
