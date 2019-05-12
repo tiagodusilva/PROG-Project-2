@@ -689,7 +689,7 @@ void statisticsMenu(Agency & agency)
 		printMenu({ "Previous Menu", // 0
 			"Show statistics", // 1
 			"Most visited Destinations", // 2
-			"Client Pack recommendations"}); // 3
+			"Client Recommendations"}); // 3
 
 		if (!cu::readInt(op, "Select Option"))
 			return;
@@ -726,7 +726,17 @@ void statisticsMenu(Agency & agency)
 			cu::pauseConsole();
 
 		case 3: // Client Pack Recommendations
-			// TODO
+			cout << "--------  Client Recommendations  --------" << endl << endl;
+			//if (!cu::readInt(n, "How many destinations to focus the search"))
+			//{
+			//	cout << "Operation aborted" << endl;
+			//	cu::pauseConsole();
+			//	break;
+			//}
+
+			cout << endl;
+			agency.printClientRecommendations();
+			cu::pauseConsole();
 			break;
 
 		default:
