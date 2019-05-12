@@ -44,6 +44,8 @@ public:
 
 	void printSummary() const;
 
+	void addPack(const int id, const int price, const int tickets);
+
 	// OUTPUT STREAM OPERATOR OVERRIDES
 
 	friend std::ostream& operator<< (std::ostream & stream, const Client & client);

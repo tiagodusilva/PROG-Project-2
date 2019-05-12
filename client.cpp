@@ -139,6 +139,14 @@ void Client::printSummary() const
 		<< "    VAT: " << this->vat;
 }
 
+void Client::addPack(const int id, const int price, const int tickets)
+{
+	for (int i = 0; i < tickets; i++)
+		this->travelPacks.push_back(id);
+
+	this->totalSpent += price * tickets;
+}
+
 // OUTPUT STREAM OPERATOR OVERRIDES
 
 ostream& operator<<(ostream& stream, const Client & client)
