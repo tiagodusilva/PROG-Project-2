@@ -25,6 +25,7 @@ void printMenu(const vector<string> & options)
 void confirmSaveData(const Agency & agency)
 {
 	char c = '\0';
+	cout << "--------  Save Changes  --------" << endl << endl;
 	if (!cu::readConfirmation(c, "Do you wish to save all changes"))
 	{
 		cout << "Ctrl + Z detected\nWARNING: Data was not saved" << endl;
@@ -97,6 +98,7 @@ bool selectPackMenu(const Agency & agency, int & id, const string & menuTitle, c
 			}
 			else
 			{
+				cout << endl;
 				// In this case, id means option
 				if (!cu::readInt(id, "Select option"))
 				{
@@ -166,26 +168,35 @@ bool selectClientMenu(const Agency & agency, int & vat, const string & menuTitle
 			break;
 		case 2:
 			cout << "--------  Client List  --------" << endl << endl;
-			agency.clientMap(clientMap, clientCounter, true);
-
-			// In this case, vat means option
-			if (!cu::readInt(vat, "Select option"))
+			if (!agency.clientMap(clientMap, clientCounter, true))
 			{
 				cout << "Operation aborted" << endl;
 				cu::pauseConsole();
-				return false;
+				break;
 			}
-
-			if (vat < 1 || vat > clientCounter)
+			else
 			{
-				cout << "Option out of range\nOperation aborted" << endl;
-				cu::pauseConsole();
-				return false;
+				cout << endl;
+				// In this case, vat means option
+				if (!cu::readInt(vat, "Select option"))
+				{
+					cout << "Operation aborted" << endl;
+					cu::pauseConsole();
+					return false;
+				}
+
+				if (vat < 1 || vat > clientCounter)
+				{
+					cout << "Option out of range\nOperation aborted" << endl;
+					cu::pauseConsole();
+					return false;
+				}
+
+				// Converts option to client VAT
+				vat = clientMap[vat];
+				return true;
 			}
 
-			// Converts option to client VAT
-			vat = clientMap[vat];
-			return true;
 
 			break;
 		default:
@@ -430,16 +441,13 @@ void viewClients(const Agency & agency)
 			cu::pauseConsole();
 			break;
 		case 2:
-			if (!cu::readInt(vat, "VAT of the Client to view"))
+			if (selectClientMenu(agency, vat, "Client to View"))
 			{
-				cout << "Operation aborted" << endl;
+				agency.printClientByVAT(vat);
+				cout << endl;
 				cu::pauseConsole();
-				break;
 			}
 
-			agency.printClientByVAT(vat);
-			cout << endl;
-			cu::pauseConsole();
 			break;
 		default:
 			cout << "Wrong Input" << endl;
@@ -586,12 +594,48 @@ void printAgencyStatistics(Agency & agency)
 void purchasePackMenu(Agency & agency)
 {
 	int id, vat, tickets;
-	if (selectClientMenu(agency, vat, "Client responsible for the Purchase")
-		&& selectPackMenu(agency, id, "Pack to buy", true)
-		&& cu::readInt(tickets, "Number of tickets to buy"))
-	{	// Only enters if all operations were successful
-		agency.purchasePack(vat, id, tickets);
-		cu::pauseConsole();
+	char op;
+	if (selectClientMenu(agency, vat, "Client responsible for the Purchase"))
+	{
+		system("cls");
+		if (selectPackMenu(agency, id, "Pack to buy", true))
+		{
+			system("cls");
+			if (cu::readInt(tickets, "Number of tickets to buy"))
+			{
+				// Only enters if all operations were successful
+				system("cls");
+				cout << "Purchase details:" << endl << endl;
+				cout << "CLIENT:" << endl;
+				if (!agency.printClientByVAT(vat))
+				{
+					cout << "Operation aborted";
+					cu::pauseConsole();
+					return;
+				}
+				cout << endl << "PACK:" << endl;
+				if (!agency.printPackById(id))
+				{
+					cout << "Operation aborted";
+					cu::pauseConsole();
+					return;
+				}
+				cout << "TICKETS: " << tickets << endl << endl;
+
+				if (!cu::readConfirmation(op, "Do you want to proceed with the Purchase"))
+				{
+					cout << "Operation aborted" << endl;
+					cu::pauseConsole();
+					return;
+				}
+				if (op == 'y')
+				{
+					agency.purchasePack(vat, id, tickets);
+					cu::pauseConsole();
+					return;
+				}
+			}
+		}
 	}
 	 
 	// Ends up here if any of the operations were unsuccessful
@@ -599,6 +643,7 @@ void purchasePackMenu(Agency & agency)
 	cu::pauseConsole();
 	return;
 }
+
 
 
 void agencyMainMenu(Agency & agency)
@@ -660,6 +705,7 @@ void agencyMainMenu(Agency & agency)
 			printAgencyStatistics(agency);
 			break;
 		case 8:
+			cout << "--------  Most visited Destinations  --------" << endl << endl;
 			if (!cu::readInt(n, "How many destinations do you wish to see"))
 			{
 				cout << "Operation aborted" << endl;

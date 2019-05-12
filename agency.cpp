@@ -378,24 +378,24 @@ bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker)
 
 // CONSOLE OUTPUT METHODS
 
-void Agency::printClientByVAT(unsigned vat) const
+bool Agency::printClientByVAT(unsigned vat) const
 {
 	cout << endl;
 
 	if (this->clientList.empty()) {
 		cout << "No registered clients" << endl;
-		return;
+		return false;
 	}
 
 	for (size_t i = 0; i < this->clientList.size(); i++) {
 		if (this->clientList.at(i).getVAT() == vat) {
 			cout << this->clientList.at(i) << endl;
-			return;
+			return true;
 		}
 	}
 
 	cout << "Client with VAT \"" << vat << "\" not found" << endl;
-	return;
+	return false;
 }
 
 void Agency::printClients() const
@@ -480,9 +480,15 @@ void Agency::printPacksByClient(const int vat) const
 	cout << "Client with VAT \"" << vat << "\" not found" << endl;
 }
 
-void Agency::printPackById(const int id) const
+bool Agency::printPackById(const int id) const
 {
 	cout << endl;
+
+	if (this->packList.empty())
+	{
+		cout << "No registered Packs";
+		return false;
+	}
 
 	int aux = abs(id);
 	for (size_t i = 0; i < this->packList.size(); i++)
@@ -490,11 +496,12 @@ void Agency::printPackById(const int id) const
 		if (abs(this->packList.at(i).getId()) == aux)
 		{
 			cout << this->packList.at(i) << endl;
-			return;
+			return true;
 		}
 	}
 
 	cout << "Pack with id \"" << id << "\" not found" << endl;
+	return false;
 }
 
 void Agency::printPacks(const bool onlyAvailable) const

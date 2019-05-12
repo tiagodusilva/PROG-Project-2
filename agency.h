@@ -103,13 +103,15 @@ public:
 
 	/**
 		Prints the pack with a given ID
+		Returns false if something goes wrong
 	*/
-	void printPackById(const int) const;
+	bool printPackById(const int) const;
 
 	/**
 		Prints a client with a given vat to the screen
+		Returns false if something goes wrong
 	*/
-	void printClientByVAT(unsigned vat) const;
+	bool printClientByVAT(unsigned vat) const;
 
 	/**
 		Prints all packs to the screen in a formatted form
@@ -194,6 +196,7 @@ public:
 		Map will have a size of packCounter
 		If onlyAvailable is true, it will only process available Packs
 		If printMap is true, it will print the list to the screen
+		Returns false if the map is empty when the methods finishes
 	*/
 	bool packMap(std::map<int, int>& packMap, int & packCounter, const bool onlyAvailable, const bool printMap) const;
 
@@ -201,6 +204,7 @@ public:
 		Creates with <option, clientVat> of all Clients
 		Map will have a size of clientCounter
 		If printMap is true, it will print the list to the screen
+		Returns false if the map is empty when the methods finishes
 	*/
 	bool clientMap(std::map<int, int>& clientMap, int & clientCounter, const bool printMap) const;
 
