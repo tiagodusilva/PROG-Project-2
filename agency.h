@@ -30,8 +30,8 @@ public:
 	std::vector<TravelPack> getPackList() const;
 	size_t getPackListSize() const;
 	TravelPack getPackWithId(const int id) const;
-	// Will return false if out of index
-	bool getAvaiabilityOfPackAtIndex(const int index);
+	// Will return false if pack is not found
+	bool getAvailabilityOfPack(const int id) const;
 	std::string getFileNameClients() const;
 	std::string getFileNamePacks() const;
 
@@ -190,11 +190,19 @@ public:
 	bool isVatUsed(unsigned vat) const;
 
 	/**
-		Creates a map with <option, packId> of all available packs
+		Creates a map with <option, packId> of all Packs
 		Map will have a size of packCounter
+		If onlyAvailable is true, it will only process available Packs
 		If printMap is true, it will print the list to the screen
 	*/
-	bool availablePackMap(std::map<int, int>& packMap, int & packCounter, const bool printMap) const;
+	bool packMap(std::map<int, int>& packMap, int & packCounter, const bool onlyAvailable, const bool printMap) const;
+
+	/**
+		Creates with <option, clientVat> of all Clients
+		Map will have a size of clientCounter
+		If printMap is true, it will print the list to the screen
+	*/
+	bool clientMap(std::map<int, int>& clientMap, int & clientCounter, const bool printMap) const;
 
 private:
 	int maxPackId;
