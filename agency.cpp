@@ -388,7 +388,7 @@ void Agency::printClientByVAT(unsigned vat) const
 		}
 	}
 
-	cout << "Client with VAT " << vat << " not found" << endl;
+	cout << "Client with VAT \"" << vat << "\" not found" << endl;
 	return;
 }
 
@@ -740,77 +740,54 @@ void Agency::saveData() const
 
 // OTHER PUBLIC METHODS
 
-bool Agency::purchasePack(int vat, const int id)
+bool Agency::purchasePack(const int vat, const int id, const int tickets)
 {
+	Client* client = this->getClientPointer(vat);
 
-	int tickets = -1;
-	bool packFound = false;
-	
-	if (!isVatUsed(vat))
+	if (client == nullptr)
 	{
-		cout << "Client with VAT " << vat << " not found" << endl;
+		cout << "Client with VAT \"" << vat << "\" not found" << endl;
+	}
+
+	TravelPack* pack = this->getPackPointer(id);
+
+	if (pack == nullptr) {
+		cout << "Pack with ID \"" << id << "\" not found" << endl;
 		return false;
 	}
 
-	for (size_t i = 0; i < this->packList.size(); i++) {
-		if (abs(this->packList.at(i).getId()) == id) {
-			packFound = true;
-			break;
-		}
-	}
-
-	if (!packFound) {
-		cout << "Pack with ID " << id << " not found..." << endl;
+	if (!pack->isAvailable()) { 
+		cout << "Pack with ID \"" << id << "\" is unavailable" << endl;
 		return false;
 	}
 
-	if (!this->getPackWithId(id).isAvailable()) { 
-		cout << "Pack with ID " << id << " is unavailable..." << endl;
+	int availableTickets = pack->getMaxBookings() - pack->getCurrentBookings();
+	if (tickets <= 0)
+	{
+		cout << "Can't purchase less than one ticket" << endl;
 		return false;
 	}
 
-	cout << "Tickets available for this pack: " << !this->getPackWithId(id).getMaxBookings() - this->getPackWithId(id).getCurrentBookings() << endl << endl;
-
-	while (cu::readInt(tickets, "Number of tickets")) {
-		if (tickets > 0 && tickets + this->getPackWithId(id).getCurrentBookings() <= this->getPackWithId(id).getMaxBookings())
-			break;
-		else
-			cout << "Invalid number of tickets..." << endl;
-	}
-
-	if (tickets == -1)  // In case user inserts ^Z in above question
+	if (tickets > availableTickets)
+	{
+		cout << "Can't overbook a Pack" << endl;
 		return false;
-
-	// update pack info
-	for (size_t i = 0; i < this->packList.size(); i++) {
-
-		if (this->packList.at(i).getId() == id) {
-			this->packList.at(i).setCurrentBookings(this->packList.at(i).getCurrentBookings() + tickets);
-			if (this->packList.at(i).getCurrentBookings() == this->packList.at(i).getMaxBookings()) {
-				this->packList.at(i).makeUnavailable();
-				cout << "This pack is now unavailable" << endl;
-			}
-			break;
-		}	
 	}
 
-	// update client info
-	for (size_t j = 0; j < this->clientList.size(); j++) {
+	// After this point, all inputs were valid
 
-		if (this->clientList.at(j).getVAT() == vat) {
+	// Update pack info
 
-			vector<int> clientPackListCopy = this->clientList.at(j).getTravelPacksList();
-			this->clientList.at(j).setTotalSpent(this->clientList.at(j).getTotalSpent() + this->getPackWithId(id).getPrice()*tickets);
-			
-			for (int k = 0; k < tickets; k++) {
-				clientPackListCopy.push_back(id);
-			}
+	pack->setCurrentBookings(pack->getCurrentBookings() + tickets);
 
-			this->clientList.at(j).setTravelPacksList(clientPackListCopy);
-			break;
-		}
-	}
-	cout << "Successful purchase operation" << endl;
+	if (pack->getCurrentBookings() >= pack->getMaxBookings())
+		pack->makeUnavailable();
+
+	// Update client info
+
+	client->addPack(id, pack->getPrice(), tickets);
+
+	cout << "Purchase successful" << endl;
 
 	return true;
 }
@@ -855,28 +832,28 @@ bool Agency::removeClientByIndex(const int index)
 	return true;
 }
 
-bool Agency::makePackUnavaiableById(const int id)
+bool Agency::makePackUnavailableById(const int id)
 {
-	if (this->clientList.empty())
+	if (this->packList.empty())
 	{
 		cout << "No Packs to be removed" << endl;
 		return false;
 	}
 
-	int auxId = abs(id);
-	for (size_t i = 0; i < this->packList.size(); i++) {
-		if (abs(this->packList.at(i).getId()) == auxId) {
-			this->packList.at(i).makeUnavailable();
-			cout << "Pack is now unavaiable" << endl;
-			return true;
-		}
+	TravelPack* pack = this->getPackPointer(id);
+
+	if (pack == nullptr)
+	{
+		cout << "Pack not found" << endl;
+		return false;
 	}
 
-	cout << "Pack not found" << endl;
-	return false;
+	pack->makeUnavailable();
+	cout << "Pack is now unavailable" << endl;
+	return true;
 }
 
-bool Agency::makePackUnavaiableByIndex(const int index)
+bool Agency::makePackUnavailableByIndex(const int index)
 {
 	if (this->packList.empty())
 	{
@@ -892,12 +869,13 @@ bool Agency::makePackUnavaiableByIndex(const int index)
 
 	this->packList.at(index).makeUnavailable();
 
-	cout << "Pack is now unavaiable" << endl;
+	cout << "Pack is now unavailable" << endl;
 	return true;
 }
 
+// This is kinda agencyMenu, but private stuff is private
 bool Agency::changeClient(const unsigned vat) {
-	int i, num;
+	int num;
 	string str;
 	Address auxAddress;
 
@@ -905,15 +883,13 @@ bool Agency::changeClient(const unsigned vat) {
 		cout << "No clients to be changed" << endl;
 		return false;
 	}
-	else if (!isVatUsed(vat)) {
-		cout << "Client with VAT " << vat << " not found" << endl;
-		return false;
-	}
 
-	for (size_t j = 0; j < this->clientList.size(); j++) {
-		if (this->clientList.at(j).getVAT() == vat) {
-			i = j; break;
-		}
+	Client* client = this->getClientPointer(vat);
+
+	if (client == nullptr)
+	{
+		cout << "Client with VAT \"" << vat << "\" not found" << endl;
+		return false;
 	}
 
 	while (true)
@@ -923,13 +899,13 @@ bool Agency::changeClient(const unsigned vat) {
 		cout << "\t1. Name" << endl << "\t2. VAT" << endl << "\t3. Household" << endl
 			<< "\t4. Address" << endl << "\t0. Cancel" << endl;
 
-		if (!cu::readInt(num, "What do you want to change"))
+		if (!cu::readInt(num, "Field to change"))
 			return false;
 		if (num >= 0 && num <= 4)
 			break;
 		else
 		{
-			cout << "Not a valid option!" << endl;
+			cout << "Invalid option" << endl;
 			cu::pauseConsole();
 		}
 	}
@@ -939,24 +915,45 @@ bool Agency::changeClient(const unsigned vat) {
 	switch (num)
 	{
 	case 1:
-		cu::readStr(str, "New Name");
-		clientList.at(i).setName(str); break;
+		if (!cu::readStr(str, "New Name"))
+		{
+			cout << "Operation Aborted" << endl;
+			return false;
+		}
+		client->setName(str); break;
 	case 2:
 		while (true) {
-			cu::readInt(num, "New VAT");
-			if (!isVatUsed(num)) break;
+			if (!cu::readInt(num, "New VAT"))
+			{
+				cout << "Operation aborted" << endl;
+				return false;
+			}
+			if (!isVatUsed(num))
+			{
+				client->setVAT(num, this->clientList);
+				break;
+			}
 		}
-		clientList.at(i).setVAT(num, this->clientList); break;
+		break;
 	case 3:
 		while (true) {
-			cu::readInt(num, "New Household");
+			if (!cu::readInt(num, "New Household"))
+			{
+				cout << "Operation aborted" << endl;
+				return false;
+			}
 			if (num >= 1) break;
 			cout << "Insert a valid household number" << endl;
 		}
-		clientList.at(i).setHousehold(num); break;
+		client->setHousehold(num); break;
 	case 4:
-		auxAddress.readUserInput();
-		clientList.at(i).setAddress(auxAddress); break;
+		if (!auxAddress.readUserInput())
+		{
+			cout << "Operation aborted" << endl;
+			return false;
+		}
+		client->setAddress(auxAddress);
+		break;
 	default:
 		return false;
 	}
@@ -967,24 +964,16 @@ bool Agency::changeClient(const unsigned vat) {
 	return true;
 }
 
+// This is kinda agencyMenu, but private stuff is private
 bool Agency::changePack(const int id)
 {
-	int absId = abs(id);
 	if (this->packList.empty())
 	{
 		cout << "There are no packs to change" << endl;
 		return false;
 	}
 
-	TravelPack* pack = nullptr;
-	for (size_t i = 0; i < this->packList.size(); i++)
-	{
-		if (abs(this->packList.at(i).getId()) == absId)
-		{
-			pack = &this->packList.at(i);
-			break;
-		}
-	}
+	TravelPack* pack = this->getPackPointer(id);
 
 	if (pack == nullptr)
 	{
@@ -1091,6 +1080,7 @@ bool Agency::changePack(const int id)
 			for (size_t i = 0; i < this->clientList.size(); i++)
 			{
 				Client* clientPtr = &this->clientList.at(i);
+				int absId = abs(id);
 				for (size_t j = 0; j < clientPtr->getTravelPacksListSize(); j++)
 				{
 					if (abs(clientPtr->getTravelPackAt(j)) == absId)
@@ -1139,6 +1129,41 @@ bool Agency::isVatUsed(unsigned vat) const
 	}
 
 	return foundVat;
+}
+
+bool Agency::availablePackMap(std::map<int, int> & packMap, int & packsFound,const bool printMap) const
+{
+	if (this->packList.empty())
+	{
+		cout << "No Packs registered" << endl;
+		return false;
+	}
+
+	packMap.clear();
+	packsFound = 0;
+	for (size_t i = 0; i < this->packList.size(); i++)
+	{
+		if (this->packList.at(i).isAvailable())
+		{
+			packsFound++;
+			if (printMap)
+			{
+				cout << packsFound << ". ";
+				this->packList.at(i).printSummary();
+				cout << endl;
+			}
+			
+			packMap.insert(pair<int, int> (packsFound, this->packList.at(i).getId()));
+		}
+	}
+
+	if (packsFound == 0) // No packs available
+	{
+		cout << "There are no available Packs" << endl;
+		return false;
+	}
+
+	return true;
 }
 
 // PRIVATE METHODS
@@ -1351,4 +1376,27 @@ void Agency::printAllPacksToFile() const
 	fout.close();
 
 	return;
+}
+
+Client* Agency::getClientPointer(const int vat)
+{
+	for (size_t i = 0; i < this->clientList.size(); i++)
+	{
+		if (this->clientList.at(i).getVAT() == vat)
+			return &this->clientList.at(i);
+	}
+
+	return nullptr;
+}
+
+TravelPack* Agency::getPackPointer(const int id)
+{
+	int auxId = abs(id);
+	for (size_t i = 0; i < this->packList.size(); i++)
+	{
+		if (abs(this->packList.at(i).getId()) == auxId)
+			return &this->packList.at(i);
+	}
+
+	return nullptr;
 }

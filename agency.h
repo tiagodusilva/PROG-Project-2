@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <map>
 
 class Client;
 
@@ -150,7 +151,7 @@ public:
 	/**
 		Sell a pack by the given VAT and pack ID
 	*/
-	bool purchasePack(int vat, const int id);
+	bool purchasePack(const int vat, const int id, const int tickets);
 
 	/**
 		Remove a Client by inserting a vat or choosing from a list of clients
@@ -163,9 +164,9 @@ public:
 	/**
 		Makes the pack with the given ID permanently unavaiable
 	*/
-	bool makePackUnavaiableById(const int id);
+	bool makePackUnavailableById(const int id);
 
-	bool makePackUnavaiableByIndex(const int index);
+	bool makePackUnavailableByIndex(const int index);
 
 	/**
 		Change a Client by a given vat
@@ -181,6 +182,13 @@ public:
 		Returns true if a given VAT is already registered to a Client
 	*/
 	bool isVatUsed(unsigned vat) const;
+
+	/**
+		Creates a map with <option, packId> of all available packs
+		Map will have a size of packCounter
+		If printMap is true, it will print the list to the screen
+	*/
+	bool availablePackMap(std::map<int, int>& packMap, int & packCounter, const bool printMap) const;
 
 private:
 	int maxPackId;
@@ -205,6 +213,18 @@ private:
 	void printAllClientsToFile() const;
 
 	void printAllPacksToFile() const;
+
+	/**
+		Returns a pointer to the client with the given VAT
+		Returns nullptr if not found
+	*/
+	Client* getClientPointer(const int vat);
+
+	/*
+		Returns a pointer to the TravelPack with the given Id
+		Returns nullptr if not found
+	*/
+	TravelPack* getPackPointer(const int id);
 
 };
 
