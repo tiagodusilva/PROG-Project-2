@@ -135,9 +135,10 @@ bool TravelPack::setCurrentBookings(int currentBookings)
 
 void TravelPack::printSummary() const
 {
-	cout << left << setw(15) << this->destinations.front() << right
-		<< "    - " << this->departureDate
-		<< " ~ " << this->returnDate;
+	cout << left << setw(20) << this->destinations.front() << right
+		<< " - " << this->departureDate
+		<< " ~ " << this->returnDate
+		<< " - Tickets left: " << (this->maxBookings - this->currentBookings);
 }
 
 bool TravelPack::isAvailable() const
