@@ -86,6 +86,12 @@ public:
 	// OUTPUT METHODS
 
 	/**
+		Prints a client with a given vat to the screen
+		Returns false if something goes wrong
+	*/
+	bool printClientByVAT(unsigned vat) const;
+
+	/**
 		Prints all the Agency's clients to the screen
 	*/
 	void printClients() const;
@@ -108,10 +114,14 @@ public:
 	bool printPackById(const int) const;
 
 	/**
-		Prints a client with a given vat to the screen
-		Returns false if something goes wrong
+		Prints all the packs that have been bought by every client
 	*/
-	bool printClientByVAT(unsigned vat) const;
+	void printPacksSoldToEveryone() const;
+
+	/**
+		Prints all packs that have been sold at least once
+	*/
+	void printPacksSold() const;
 
 	/**
 		Prints all packs to the screen in a formatted form

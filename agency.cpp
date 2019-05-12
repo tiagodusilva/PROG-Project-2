@@ -504,6 +504,84 @@ bool Agency::printPackById(const int id) const
 	return false;
 }
 
+void Agency::printPacksSoldToEveryone() const
+{
+	set<int> packSet;
+
+	for (size_t i = 0; i < this->packList.size(); i++)
+	{
+		packSet.insert(abs(this->packList.at(i).getId()));
+	}
+
+	for (size_t i = 0; i < this->clientList.size(); i++)
+	{
+		if (packSet.empty())
+			break;
+
+		for (auto it = packSet.begin(); it != packSet.end(); )
+		{
+			if (!this->clientList.at(i).hasBought(*it))
+			{
+				it = packSet.erase(it);
+				// Returns the iterator to the next element (past the removed one)
+				// This is the way for c++11, in other standards it will break
+			}
+			else
+				++it; // If not erased, we need to move the iterator to the next element
+		}
+	
+	}
+
+	if (packSet.empty())
+	{
+		cout << "There are no packs that have been sold to everyone" << endl;
+		return;
+	}
+
+	auto it = packSet.begin();
+	// First element (valid because we know it's not empty)
+	this->printPackById(*it);
+	++it;
+
+	// Iterating from the second element (if they exist)
+	for (; it != packSet.end(); ++it)
+	{
+		cout << PACK_OUTPUT_SEPARATOR << endl;
+		this->printPackById(*it);
+	}
+}
+
+void Agency::printPacksSold() const
+{
+	set <int> packSet;
+
+	for (size_t i = 0; i < this->clientList.size(); i++)
+	{
+		for (size_t j = 0; j < this->clientList.at(i).getTravelPacksListSize(); j++)
+		{
+			packSet.insert(this->clientList.at(i).getTravelPackAt(j));
+		}
+	}
+
+	if (packSet.empty())
+	{
+		cout << "No packs have been sold to anyone" << endl;
+	}
+
+	auto it = packSet.begin();
+	// First element (valid because we know it's not empty)
+	this->printPackById(*it);
+	++it;
+
+	// Iterating from the second element (if they exist)
+	for (; it != packSet.end(); ++it)
+	{
+		cout << PACK_OUTPUT_SEPARATOR << endl;
+		this->printPackById(*it);
+	}
+
+}
+
 void Agency::printPacks(const bool onlyAvailable) const
 {
 
@@ -1149,7 +1227,7 @@ bool Agency::packMap(std::map<int, int> & packMap, int & packsFound, const bool 
 			packsFound++;
 			if (printMap)
 			{
-				cout << packsFound << ". ";
+				cout << "\t" << packsFound << ". ";
 				this->packList.at(i).printSummary();
 				cout << endl;
 			}
@@ -1183,7 +1261,7 @@ bool Agency::clientMap(std::map<int, int> & clientMap, int & clientCounter, cons
 		clientCounter++;
 			if (printMap)
 			{
-				cout << clientCounter << ". ";
+				cout << "\t" << clientCounter << ". ";
 				this->clientList.at(i).printSummary();
 				cout << endl;
 			}
