@@ -1204,26 +1204,19 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 
 
 	getline(file, str);
-	client.setName(str);
-	if (file.eof() || file.fail()) return false;
+	if (file.eof() || file.fail() || !client.setName(str)) return false;
 	lineTracker++;
 
 	file >> auxInt;
-	client.setVAT(auxInt, clientList);
-	if (file.eof() || file.fail()) return false;
+	if (file.eof() || file.fail() || !client.setVAT(auxInt, clientList)) return false;
 	lineTracker++;
 
 	file >> auxInt;
-	client.setHousehold(auxInt);
-	if (file.eof() || file.fail()) return false;
+	if (file.eof() || file.fail() || !client.setHousehold(auxInt)) return false;
 	lineTracker++;
 	file.ignore(1000, '\n');
 
-	if (!auxAddress.readFromFile(file, lineTracker))
-		return false;
-	else {
-		client.setAddress(auxAddress);
-	}
+	if (!auxAddress.readFromFile(file, lineTracker) || !client.setAddress(auxAddress)) return false;
 
 	if (file.peek() != '-')
 	{
@@ -1257,17 +1250,17 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 				break;
 		}
 
-		client.setTravelPacksList(travelPacks);
+		if (!client.setTravelPacksList(travelPacks)) return false;
 		lineTracker++;
 	}
 	else // If it peeks a '-'
 	{
 		file.ignore(1000, '\n'); // Advance to the next line
-		client.setTravelPacksList(travelPacks); // Sets to {} ( travelPacks is initialized to {} )
+		if (!client.setTravelPacksList(travelPacks)) return false; // Sets to {} ( travelPacks is initialized to {} )
 	}
 
 	file >> auxInt;
-	client.setTotalSpent(auxInt);
+	if (file.eof() || file.fail() || !client.setTotalSpent(auxInt)) return false;
 	lineTracker++;
 
 	file.ignore(1000, '\n');
@@ -1291,7 +1284,7 @@ bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned & 
 
 
 	getline(fin, s);
-	if (fin.eof()) return false;
+	if (fin.eof() || fin.fail()) return false;
 
 	// Separate all read locations
 	int start = 0, end = s.find('-');
@@ -1322,31 +1315,25 @@ bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned & 
 		} while (end != string::npos); // Stops reading once there's nothing more
 	}
 
-	if (!pack.setDestinations(destinations))
-		return false;
+	if (!pack.setDestinations(destinations)) return false;
 	lineTracker++;
 
-	if (!date.readFromFile(fin, lineTracker) || !pack.setDeparture(date))
-		return false;
+	if (!date.readFromFile(fin, lineTracker) || !pack.setDeparture(date)) return false;
 	lineTracker++;
 
-	if (!date.readFromFile(fin, lineTracker) || !pack.setReturn(date))
-		return false;
+	if (!date.readFromFile(fin, lineTracker) || !pack.setReturn(date)) return false;
 	lineTracker++;
 
 	fin >> n;
-	if (fin.eof() || fin.fail() || !pack.setPrice(n))
-		return false;
+	if (fin.eof() || fin.fail() || !pack.setPrice(n)) return false;
 	lineTracker++;
 
 	fin >> n;
-	if (fin.eof() || fin.fail() || !pack.setMaxBookings(n))
-		return false;
+	if (fin.eof() || fin.fail() || !pack.setMaxBookings(n))	return false;
 	lineTracker++;
 
 	fin >> n;
-	if (fin.eof() || fin.fail() || !pack.setCurrentBookings(n))
-		return false;
+	if (fin.eof() || fin.fail() || !pack.setCurrentBookings(n))	return false;
 	lineTracker++;
 
 	fin.ignore(1000, '\n');

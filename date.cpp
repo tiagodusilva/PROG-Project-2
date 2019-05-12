@@ -99,7 +99,7 @@ bool Date::readFromFile(ifstream& fin, unsigned int& lineTracker)
 {
 	string s;
 	getline(fin, s);
-	if (fin.eof()) return false;
+	if (fin.eof() || fin.fail()) return false;
 
 	*this = Date(s);
 

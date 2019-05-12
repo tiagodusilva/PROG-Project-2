@@ -178,7 +178,7 @@ bool Address::readFromFile(ifstream & fin, unsigned int & lineTracker)
 	string s, sub;
 	int start, end;
 	getline(fin, s);
-	if (cin.eof()) return false;
+	if (fin.eof() || fin.fail()) return false;
 
 	start = 0;
 	end = s.find('/');
