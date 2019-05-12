@@ -10,8 +10,7 @@ int main()
 	// Only missing the "What is the name of the Agency?" part
 	// At a later commit it may go into agencyMainMenu
 	Agency agency;
-	if (agency.loadData("agencyTest.txt", true))
-		agencyMainMenu(agency);
+	agencyMainMenu(agency);
 
 	return 0;
 }

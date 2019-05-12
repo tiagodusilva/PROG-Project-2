@@ -749,12 +749,46 @@ void statisticsMenu(Agency & agency)
 	} // End while (!back)
 }
 
+bool loadAgencyDataMenu(Agency & agency)
+{
+	char op;
+	string s;
+
+	if (!cu::readConfirmation(op, "Do you wish to load Agency Data"))
+	{
+		cout << "Operation aborted by user" << endl;
+		return false;
+	}
+	if (op == 'n')
+	{
+		cout << "If the Agency has incorrect Data loaded, it may lead to unexpected behaviour" << endl
+			<< "Proceed at own risk" << endl;
+		cu::pauseConsole();
+		return true;
+	}
+
+	if (!cu::readStr(s, "Agency file name"))
+	{
+		cout << "Operation aborted by user" << endl;
+		return false;
+	}
+
+	return agency.loadData(s, true);
+}
+
 // Public Function
 
 void agencyMainMenu(Agency & agency)
 {
 	bool stopProgram = false;
 	int op = -1;
+
+	if (!loadAgencyDataMenu(agency))
+	{
+		cout << "Something went wrong, exiting..." << endl;
+		cu::pauseConsole();
+		return;
+	}
 
 	while (!stopProgram)
 	{
