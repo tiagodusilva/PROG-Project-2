@@ -44,6 +44,12 @@ public:
 
 	void printSummary() const;
 
+	/**
+		Returns true if the user has bought the pack
+		Id should always be posivite
+	*/
+	bool hasBought(const int id) const;
+
 	void addPack(const int id, const int price, const int tickets);
 
 	// OUTPUT STREAM OPERATOR OVERRIDES

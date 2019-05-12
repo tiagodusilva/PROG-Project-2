@@ -76,7 +76,7 @@ size_t Client::getTravelPacksListSize() const
 
 int Client::getTravelPackAt(int index) const
 {
-	if (index >= (int) this->travelPacks.size())
+	if (index < 0 || index >= (int) this->travelPacks.size())
 		return 0;
 	else
 		return this->travelPacks.at(index);
@@ -137,6 +137,17 @@ void Client::printSummary() const
 {
 	cout << left << setw(30) << this->name << right
 		<< "    VAT: " << this->vat;
+}
+
+bool Client::hasBought(const int id) const
+{
+	for (size_t i = 0; i < this->travelPacks.size(); i++)
+	{
+		if (id == this->travelPacks.at(i))
+			return true;
+	}
+
+	return false;
 }
 
 void Client::addPack(const int id, const int price, const int tickets)
