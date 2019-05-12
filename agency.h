@@ -139,7 +139,7 @@ public:
 	/**
 		Prints the N most visited destinations by all clients, N is given
 	*/
-	void printMostVisitedDestinations(int n) const;
+	void printMostVisitedDestinations(const int n) const;
 
 	// OTHER METHODS
 
@@ -147,6 +147,12 @@ public:
 		Saves all the Agency data to the files specified in the object
 	*/
 	void saveData() const;
+
+	/*
+		Generates a multimap with the most popular destinations
+		Multimap<int, string>
+	*/
+	void generatePopularDestinations(std::multimap<int, std::string>& reversedPackMap) const;
 
 	/**
 		Sell a pack by the given VAT and pack ID

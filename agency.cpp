@@ -692,30 +692,11 @@ void Agency::printStatistics() const {
 	cout << "Total value of packs sold: " << totalSold << endl;
 }
 
-void Agency::printMostVisitedDestinations(int n) const {
+void Agency::printMostVisitedDestinations(const int n) const {
 	int auxInt = 1;
-	map<string, int> packMap;
 	multimap<int, string> reversedPackMap;
 
-	// create a map of a place and the number of times it was visited by all clients
-	for (size_t i = 0; i < this->clientList.size(); i++) {
-
-		for (size_t j = 0; j < this->clientList.at(i).getTravelPacksList().size(); j++) {
-
-			for (size_t k = 0; k < this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationsSize(); k++) {
-
-				if (packMap.find(this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)) == packMap.end())
-					packMap[this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)] = 1;
-
-				else
-					packMap[this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)] += 1;
-			}
-		}
-	}
-
-	// change the key and value of packMap in order to order by the number of visits
-	for (auto& iter : packMap)
-		reversedPackMap.insert(pair <int, string>(iter.second, iter.first));
+	this->generatePopularDestinations(reversedPackMap);
 
 	for (auto iter = reversedPackMap.rbegin(); iter != reversedPackMap.rend(); ++iter) {
 		cout << '\t' << auxInt << ". " << iter->second;
@@ -736,6 +717,32 @@ void Agency::saveData() const
 }
 
 // OTHER PUBLIC METHODS
+
+void Agency::generatePopularDestinations(std::multimap<int, string> & reversedPackMap) const
+{
+	map<string, int> packMap;
+	reversedPackMap.clear();
+
+	// create a map of a place and the number of times it was visited by all clients
+	for (size_t i = 0; i < this->clientList.size(); i++) {
+
+		for (size_t j = 0; j < this->clientList.at(i).getTravelPacksList().size(); j++) {
+
+			for (size_t k = 0; k < this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationsSize(); k++) {
+
+				if (packMap.find(this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)) == packMap.end())
+					packMap[this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)] = 1;
+
+				else
+					packMap[this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)] += 1;
+			}
+		}
+	}
+
+	// change the key and value of packMap in order to order by the number of visits
+	for (auto& iter : packMap)
+		reversedPackMap.insert(pair <int, string>(iter.second, iter.first));
+}
 
 bool Agency::purchasePack(const int vat, const int id, const int tickets)
 {
