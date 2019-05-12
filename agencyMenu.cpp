@@ -5,6 +5,8 @@
 
 using namespace std;
 
+// Private Functions
+
 /**
 	Prints all options to the screen
 	To not include an option 0, the first string should be ""
@@ -98,16 +100,16 @@ bool selectPackMenu(const Agency & agency, int & id, const string & menuTitle, c
 			}
 			else
 			{
-				cout << endl;
+				cout << "\t0. Cancel\n" << endl;
 				// In this case, id means option
-				if (!cu::readInt(id, "Select option"))
+				if (!cu::readInt(id, "Select option") || id == 0)
 				{
 					cout << "Operation aborted" << endl;
 					cu::pauseConsole();
 					break;
 				}
 
-				if (id < 1 || id > packsFound)
+				if (id < 0 || id > packsFound)
 				{
 					cout << "Option out of range\nOperation aborted" << endl;
 					cu::pauseConsole();
@@ -176,16 +178,16 @@ bool selectClientMenu(const Agency & agency, int & vat, const string & menuTitle
 			}
 			else
 			{
-				cout << endl;
+				cout << "\t0. Cancel\n" << endl;
 				// In this case, vat means option
-				if (!cu::readInt(vat, "Select option"))
+				if (!cu::readInt(vat, "Select option") || vat == 0)
 				{
 					cout << "Operation aborted" << endl;
 					cu::pauseConsole();
 					return false;
 				}
 
-				if (vat < 1 || vat > clientCounter)
+				if (vat < 0 || vat > clientCounter)
 				{
 					cout << "Option out of range\nOperation aborted" << endl;
 					cu::pauseConsole();
@@ -209,19 +211,67 @@ bool selectClientMenu(const Agency & agency, int & vat, const string & menuTitle
 	} // End while (!back)
 }
 
-void viewPacksSoldToClient(Agency & agency)
+void viewPacksSoldMenu(Agency & agency)
 {
-	cout << "Packs sold to Client:" << endl;
+	int op = -1;
+	bool back = false;
 
-	int vat;
+	while (!back)
+	{
+		cout << "--------  View Packs sold to Clients  --------" << endl << endl;
+		printMenu({ "Previous Menu", // 0
+			"Packs sold to all Clients", // 1
+			"Packs sold at least once", // 2
+			"Packs sold to a specific Client", }); // 3
 
-	if (!cu::readInt(vat, "Client's VAT"))
-		return;
+		if (!cu::readInt(op, "Select Option"))
+			return;
 
-	agency.printPacksByClient(vat);
+		if (op >= 0 && op <= 3)
+			system("cls");
 
-	cout << endl;
-	cu::pauseConsole();
+		int vat;
+		switch (op)
+		{
+		case 0:
+			back = true;
+			break;
+
+		case 1:
+			cout << "Packs sold to all Clients:" << endl;
+			agency.printPacksSoldToEveryone();
+			cout << endl;
+			cu::pauseConsole();
+			break;
+
+		case 2:
+			cout << "Packs sold at least once:" << endl;
+			agency.printPacksSold();
+			cout << endl;
+			cu::pauseConsole();
+			break;
+
+		case 3:
+			if (selectClientMenu(agency, vat, "Packs sold to a Client"))
+			{
+				system("cls");
+				cout << "Packs sold to Client:" << endl << endl;
+				agency.printPacksByClient(vat);
+				cout << endl;
+				cu::pauseConsole();
+			}
+			break;
+
+		default:
+			cout << "Wrong Input" << endl;
+			cu::pauseConsole();
+			break;
+		}
+
+		system("cls");
+
+	} // End while (!back)
+
 }
 
 void viewPacks(const Agency & agency)
@@ -258,28 +308,30 @@ void viewPacks(const Agency & agency)
 		case 0:
 			back = true;
 			break;
+
 		case 1:
 		case 5:
 			if (op == 1)
 			{
-				cout << "Only avaiable Packs:" << endl;
+				cout << "--------  Only avaiable Packs  --------" << endl;
 				agency.printPacks(true);
 			}
 			else
 			{
-				cout << "All Packs:" << endl;
+				cout << "--------  All Packs  --------" << endl;
 				agency.printPacks(false);
 			}
 
 			cout << endl;
 			cu::pauseConsole();
 			break;
+
 		case 2:
 		case 6:
 			if (op == 2)
-				cout << "Available Packs sorted by Destination:" << endl;
+				cout << "--------  Available Packs sorted by Destination  --------" << endl << endl;
 			else
-				cout << "All Packs sorted by Destination:" << endl;
+				cout << "--------  All Packs sorted by Destination  --------" << endl << endl;
 
 			if (!cu::readStr(s, "Destination to search"))
 			{
@@ -288,7 +340,6 @@ void viewPacks(const Agency & agency)
 				break;
 			}
 
-			cout << endl;
 			if (op == 2)
 				agency.printPacksByDestination(s, true);
 			else
@@ -296,12 +347,13 @@ void viewPacks(const Agency & agency)
 			cout << endl;
 			cu::pauseConsole();
 			break;
+
 		case 3:
 		case 7:
 			if (op == 2)
-				cout << "Available Packs sorted by Dates:" << endl;
+				cout << "--------  Available Packs sorted by Dates  --------" << endl << endl;
 			else
-				cout << "All Packs sorted by Dates:" << endl;
+				cout << "--------  All Packs sorted by Dates  --------" << endl << endl;
 
 			cout << "Date Interval to sort by:" << endl;
 			cout << "Starting Date:" << endl;
@@ -332,7 +384,6 @@ void viewPacks(const Agency & agency)
 				break;
 			}
 
-			cout << endl;
 			if (op == 3)
 				agency.printPacksByDate(start, end, true);
 			else
@@ -340,12 +391,13 @@ void viewPacks(const Agency & agency)
 			cout << endl;
 			cu::pauseConsole();
 			break;
+
 		case 4:
 		case 8:
 			if (op == 2)
-				cout << "Available Packs sorted by Destination and Dates:" << endl;
+				cout << "--------  Available Packs sorted by Destination and Dates  --------" << endl << endl;
 			else
-				cout << "All Packs sorted by Destination and Dates:" << endl;
+				cout << "--------  All Packs sorted by Destination and Dates  --------" << endl << endl;
 
 			if (!cu::readStr(s, "Destination to search"))
 			{
@@ -382,7 +434,6 @@ void viewPacks(const Agency & agency)
 				break;
 			}
 
-			cout << endl;
 			if (op == 4)
 				agency.printPacksByDestinationAndDate(s, start, end, true);
 			else
@@ -390,17 +441,7 @@ void viewPacks(const Agency & agency)
 			cout << endl;
 			cu::pauseConsole();
 			break;
-		case 9:
-			cout << "Packs sold to Client:" << endl;
 
-			if (!cu::readInt(vat, "Client's VAT"))
-				break;
-
-			agency.printPacksByClient(vat);
-
-			cout << endl;
-			cu::pauseConsole();
-			break;
 		default:
 			cout << "Wrong Input" << endl;
 			cu::pauseConsole();
@@ -435,7 +476,7 @@ void viewClients(const Agency & agency)
 			back = true;
 			break;
 		case 1:
-			cout << "All Clients:" << endl;
+			cout << "--------  All Clients  --------" << endl;
 			agency.printClients();
 			cout << endl;
 			cu::pauseConsole();
@@ -485,6 +526,7 @@ void manageClients(Agency & agency)
 			break;
 
 		case 1: // New Client
+			cout << "--------  Add new Client  --------" << endl;
 			if (agency.readNewClientUserInput())
 				cout << "Client added successfully" << endl;
 			else
@@ -548,6 +590,7 @@ void managePacks(Agency & agency)
 			break;
 
 		case 1: // New Pack
+			cout << "--------  Add new Pack  --------" << endl;
 			if (agency.readNewPackUserInput())
 				cout << "Pack added successfully" << endl;
 			else
@@ -580,15 +623,6 @@ void managePacks(Agency & agency)
 
 		system("cls");
 	} // End while (!back)
-}
-
-void printAgencyStatistics(Agency & agency)
-{
-	cout << "Agency statistics:" << endl << endl;
-	agency.printStatistics();
-	cout << endl;
-	cu::pauseConsole();
-	return;
 }
 
 void purchasePackMenu(Agency & agency)
@@ -644,7 +678,68 @@ void purchasePackMenu(Agency & agency)
 	return;
 }
 
+void statisticsMenu(Agency & agency)
+{
+	int op = -1, vat;
+	bool back = false;
 
+	while (!back)
+	{
+		cout << "--------  Agency Statistics  --------" << endl << endl;
+		printMenu({ "Previous Menu", // 0
+			"Show statistics", // 1
+			"Most visited Destinations", // 2
+			"Client Pack recommendations"}); // 3
+
+		if (!cu::readInt(op, "Select Option"))
+			return;
+
+		if (op >= 0 && op <= 3)
+			system("cls");
+
+
+		int n;
+		switch (op)
+		{
+		case 0:
+			back = true;
+			break;
+
+		case 1: // Show Agency Statistics
+			cout << "--------  Statistics  --------" << endl << endl;
+			agency.printStatistics();
+			cout << endl;
+			cu::pauseConsole();
+			break;
+
+		case 2: // Most Visited Destinations
+			cout << "--------  Most visited Destinations  --------" << endl << endl;
+			if (!cu::readInt(n, "How many destinations do you wish to see"))
+			{
+				cout << "Operation aborted" << endl;
+				cu::pauseConsole();
+				break;
+			}
+
+			cout << endl;
+			agency.printMostVisitedDestinations(n);
+			cu::pauseConsole();
+
+		case 3: // Client Pack Recommendations
+			// TODO
+			break;
+
+		default:
+			cout << "Wrong Input" << endl;
+			cu::pauseConsole();
+			break;
+		}
+
+		system("cls");
+	} // End while (!back)
+}
+
+// Public Function
 
 void agencyMainMenu(Agency & agency)
 {
@@ -663,10 +758,9 @@ void agencyMainMenu(Agency & agency)
 			"Manage Packs", // 3
 			"View Clients", // 4
 			"View Packs", // 5
-			"Purchase a pack", // 6
-			"View Sales Statistics", // 7
-			"Most Visited Destinations", // 8
-			"Client Recommendations" }); // 9
+			"View Packs Sold", // 6
+			"Purchase a Pack", // 7
+			"Statistics" }); // 8
 
 		cout << "At any point enter Ctrl+Z to cancel or to go back to a previous menu\n" << endl;
 
@@ -683,48 +777,42 @@ void agencyMainMenu(Agency & agency)
 		// SWITCH STATEMENT HERE
 		switch (op)
 		{
-		case 1:
+		case 1: // Save Changes
 			confirmSaveData(agency);
 			break;
-		case 2:
+
+		case 2: // Manage Clients
 			manageClients(agency);
 			break;
-		case 3:
+
+		case 3: // Manage Packs
 			managePacks(agency);
 			break;
-		case 4:
+
+		case 4: // View Clients
 			viewClients(agency);
 			break;
-		case 5:
+
+		case 5: // View Packs
 			viewPacks(agency);
 			break;
-		case 6:
+
+		case 6: // View Packs Sold
+			viewPacksSoldMenu(agency);
+			break;
+
+		case 7: // Purchase Pack
 			purchasePackMenu(agency);
 			break;
-		case 7:
-			printAgencyStatistics(agency);
-			break;
-		case 8:
-			cout << "--------  Most visited Destinations  --------" << endl << endl;
-			if (!cu::readInt(n, "How many destinations do you wish to see"))
-			{
-				cout << "Operation aborted" << endl;
-				cu::pauseConsole();
-				break;
-			}
 
-			cout << endl;
-			agency.printMostVisitedDestinations(n);
-			cu::pauseConsole();
+		case 8: // Statistics
+			statisticsMenu(agency);
 			break;
-		case  9:
-			// TODO
-			cout << "Sorry, to do" << endl;
-			cu::pauseConsole();
-			break;
-		case 0:
+
+		case 0: // Finish Program
 			stopProgram = true;
 			break;
+
 		default:
 			cout << "Invalid Input" << endl;
 			cu::pauseConsole();
@@ -733,6 +821,7 @@ void agencyMainMenu(Agency & agency)
 
 	} // End while(!stopProgram)
 
+	system("cls");
 	confirmSaveData(agency);
 }
 
