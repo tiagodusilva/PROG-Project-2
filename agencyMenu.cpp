@@ -48,7 +48,7 @@ void confirmSaveData(const Agency & agency)
 
 void viewPacksSoldToClient(Agency & agency)
 {
-	cout << "--------  Packs sold to Client  --------" << endl;
+	cout << "Packs sold to Client:" << endl;
 
 	int vat;
 
@@ -65,8 +65,6 @@ void viewPacks(const Agency & agency)
 {
 	int op = -1;
 	bool back = false;
-	string s;
-	Date start, end;
 
 	while (!back)
 	{
@@ -79,7 +77,8 @@ void viewPacks(const Agency & agency)
 			"All", // 5
 			"All sorted by Destination", // 6
 			"All sorted by Dates", // 7
-			"All sorted by Destination and Dates"}); // 8
+			"All sorted by Destination and Dates", // 8
+			"Sold to a specific Client"}); // 9
 
 		if (!cu::readInt(op, "Select Option"))
 			return;
@@ -87,6 +86,10 @@ void viewPacks(const Agency & agency)
 		if (op >= 0 && op <= 8)
 			system("cls");
 
+		string s;
+		Date start, end;
+		int vat;
+		bool aborted = false;
 		switch (op)
 		{
 		case 0:
@@ -115,7 +118,12 @@ void viewPacks(const Agency & agency)
 			else
 				cout << "All Packs sorted by Destination:" << endl;
 
-			cu::readStr(s, "Destination to search");
+			if (!cu::readStr(s, "Destination to search"))
+			{
+				cout << "Operation aborted" << endl;
+				cu::pauseConsole();
+				break;
+			}
 
 			cout << endl;
 			if (op == 2)
@@ -134,13 +142,31 @@ void viewPacks(const Agency & agency)
 
 			cout << "Date Interval to sort by:" << endl;
 			cout << "Starting Date:" << endl;
-			start.readUserInput();
-			while (end < start)
+			if (!start.readUserInput())
 			{
-				if (end < start)
-					cout << "Ending Date must not be before Starting Date" << endl;
+				cout << "Operation aborted" << endl;
+				cu::pauseConsole();
+				break;
+			}
+
+			end = Date(0, 1, 1); // To ensure it enters while Loop
+			while (end < start && !aborted)
+			{
 				cout << "Ending Date:" << endl;
-				end.readUserInput();
+				if (!end.readUserInput())
+					aborted = true;
+				else
+				{
+					if (end < start)
+						cout << "Ending Date must not be before Starting Date" << endl;
+				}
+			}
+
+			if (aborted)
+			{
+				cout << "Operation aborted" << endl;
+				cu::pauseConsole();
+				break;
 			}
 
 			cout << endl;
@@ -158,18 +184,39 @@ void viewPacks(const Agency & agency)
 			else
 				cout << "All Packs sorted by Destination and Dates:" << endl;
 
-			cu::readStr(s, "Destination to search");
+			if (!cu::readStr(s, "Destination to search"))
+			{
+				cout << "Operation aborted" << endl;
+				cu::pauseConsole();
+				break;
+			}
 
 			cout << "Date Interval to sort by:" << endl;
 			cout << "Starting Date:" << endl;
-			start.readUserInput();
-
-			while (end < start)
+			if (!start.readUserInput())
 			{
-				if (end < start)
-					cout << "Ending Date must not be before Starting Date" << endl;
+				cout << "Operation aborted" << endl;
+				break;
+			}
+
+			end = Date(0, 1, 1); // To ensure it enters while Loop
+			while (end < start && !aborted)
+			{
 				cout << "Ending Date:" << endl;
-				end.readUserInput();
+				if (!end.readUserInput())
+					aborted = true;
+				else
+				{
+					if (end < start)
+						cout << "Ending Date must not be before Starting Date" << endl;
+				}
+			}
+
+			if (aborted)
+			{
+				cout << "Operation aborted" << endl;
+				cu::pauseConsole();
+				break;
 			}
 
 			cout << endl;
@@ -177,6 +224,17 @@ void viewPacks(const Agency & agency)
 				agency.printPacksByDestinationAndDate(s, start, end, true);
 			else
 				agency.printPacksByDestinationAndDate(s, start, end, false);
+			cout << endl;
+			cu::pauseConsole();
+			break;
+		case 9:
+			cout << "Packs sold to Client:" << endl;
+
+			if (!cu::readInt(vat, "Client's VAT"))
+				break;
+
+			agency.printPacksByClient(vat);
+
 			cout << endl;
 			cu::pauseConsole();
 			break;
@@ -379,8 +437,8 @@ void makePackUnavaiableMenu(Agency & agency)
 		if (op >= 0 && op <= 2)
 			system("cls");
 
-
-		vector<int> avaiablePacks = {};
+		map<int, int> packMap;
+		int packsFound;
 		switch (op)
 		{
 		case 0:
@@ -394,32 +452,40 @@ void makePackUnavaiableMenu(Agency & agency)
 				break;
 			}
 
-			agency.makePackUnavaiableById(id);
+			agency.makePackUnavailableById(id);
 			cu::pauseConsole();
 			break;
 		case 2:
 			cout << "--------  Make Pack Unavaiable  --------";
 			cout << endl << "Pack List:" << endl;
 			
-			for (size_t i = 0; i < agency.getPackListSize(); i++)
-			{
-				if (agency.getAvaiabilityOfPackAtIndex(i))
-				{
-
-				}
-			}
-
-			// In this case, id means index
-			if (!cu::readInt(id, "Select option"))
+			if (!agency.availablePackMap(packMap, packsFound, true))
 			{
 				cout << "Operation aborted" << endl;
 				cu::pauseConsole();
-				return;
+				break;
 			}
+			else
+			{
+				// In this case, id means option
+				if (!cu::readInt(id, "Select option"))
+				{
+					cout << "Operation aborted" << endl;
+					cu::pauseConsole();
+					break;
+				}
 
-			agency.makePackUnavaiableByIndex(id - 1);
+				if (id < 1 || id > packsFound)
+				{
+					cout << "Option out of range\nOperation aborted" << endl;
+					cu::pauseConsole();
+					break;
+				}
+				cout << "ID: " << packMap[id] << endl;
+				agency.makePackUnavailableById(packMap[id]);
 
-			cu::pauseConsole();
+				cu::pauseConsole();
+			}
 			break;
 		default:
 			cout << "Wrong Input" << endl;
@@ -515,11 +581,11 @@ void agencyMainMenu(Agency & agency)
 			"Manage Clients", // 2
 			"Manage Packs", // 3
 			"View Clients", // 4
-			"View Available Packs", // 5
-			"View Packs sold to a specific Client", // 6
-			"Purchase a pack", // 7
-			"View Sales Statistics", // 8
-			"Most Visited Destinations" }); // 9
+			"View Packs", // 5
+			"Purchase a pack", // 6
+			"View Sales Statistics", // 7
+			"Most Visited Destinations", // 8
+			"Client Recommendations" }); // 9
 
 		cout << "At any point enter Ctrl+Z to cancel or to go back to a previous menu\n" << endl;
 
@@ -532,6 +598,7 @@ void agencyMainMenu(Agency & agency)
 		if (op >= 0 && op <= 9)
 			system("cls");
 
+		int n;
 		// SWITCH STATEMENT HERE
 		switch (op)
 		{
@@ -551,15 +618,24 @@ void agencyMainMenu(Agency & agency)
 			viewPacks(agency);
 			break;
 		case 6:
-			viewPacksSoldToClient(agency);
-			break;
-		case 7:
 			//purchasePack(agency);
 			cout << "Sorry, to do" << endl;
 			cu::pauseConsole();
 			break;
-		case 8:
+		case 7:
 			printAgencyStatistics(agency);
+			break;
+		case 8:
+			if (!cu::readInt(n, "How many destinations do you wish to see"))
+			{
+				cout << "Operation aborted" << endl;
+				cu::pauseConsole();
+				break;
+			}
+
+			cout << endl;
+			agency.printMostVisitedDestinations(n);
+			cu::pauseConsole();
 			break;
 		case  9:
 			// TODO
