@@ -57,6 +57,12 @@ public:
 	*/
 	void updateAvailability();
 
+	/**
+		Please always provide s as lowerCase
+		This does not convert s to lowerCase in order to improve its efficiency
+	*/
+	bool containsDestination(const std::string & s) const;
+
 	// OUTPUT STREAM OPERATOR OVERRIDES
 
 	friend std::ostream& operator<<(std::ostream& stream, const TravelPack& pack);

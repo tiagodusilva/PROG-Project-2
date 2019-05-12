@@ -1,5 +1,5 @@
 #include "travelPack.h"
-
+#include "customUtilities.h"
 #include <iostream>
 #include <iomanip>
 
@@ -164,6 +164,21 @@ void TravelPack::updateAvailability()
 	Date now = Date().now();
 	if (this->departureDate < now || this->currentBookings >= this->maxBookings)
 		this->makeUnavailable();
+}
+
+bool TravelPack::containsDestination(const string & s) const
+{
+	string aux;
+	for (size_t i = 0; i < this->destinations.size(); i++)
+	{
+		aux = this->destinations.at(i);
+		cu::strLower(aux);
+
+		if (aux.find(s) != string::npos)
+			return true;
+	}
+
+	return false;
 }
 
 // OUTPUT STREAM OPERATOR OVERRIDES
