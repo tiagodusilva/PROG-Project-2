@@ -65,7 +65,7 @@ TravelPack Agency::getPackWithId(const int id) const {
 bool Agency::getAvailabilityOfPack(const int id) const
 {
 	int auxId = abs(id);
-	
+
 	for (size_t i = 0; i < this->packList.size(); i++)
 	{
 		if (abs(this->packList.at(i).getId()) == auxId)
@@ -771,12 +771,79 @@ void Agency::printMostVisitedDestinations(const int n) const {
 	this->generatePopularDestinations(reversedPackMap);
 
 	for (auto iter = reversedPackMap.rbegin(); iter != reversedPackMap.rend(); ++iter) {
+		if (iter->first == 0) {
+			if (auxInt == 1)
+				cout << "No places visited by any client..." << endl;
+			break;
+		}
 		cout << '\t' << auxInt << ". " << iter->second;
 		cout << " (Total Visits: " << iter->first << ")\n\n";
 		auxInt++;
 
 		if (n + 1 == auxInt) break;
 	}
+}
+
+void Agency::printClientRecommendations() const {
+
+	bool foundRecommendation = true;
+	bool auxBool = false;
+	string recommendation;
+	multimap<int, string> reversedPackMap;
+
+	this->generatePopularDestinations(reversedPackMap);
+
+	for (size_t i = 0; i < this->clientList.size(); i++) {
+
+		for (auto iter = reversedPackMap.rbegin(); iter != reversedPackMap.rend(); ++iter) {
+
+			recommendation = iter->second;
+			cu::strLower(recommendation);
+			foundRecommendation = true;
+			auxBool = false;
+
+			// checks if the recommendation is possible
+			for (size_t w = 0; w < this->packList.size(); w++) {
+				if (this->packList.at(w).containsDestination(recommendation) && this->packList.at(w).isAvailable()) {
+					auxBool = true;
+					break;
+				}
+			}
+			if (!auxBool) continue;
+
+			for (size_t j = 0; j < this->clientList.at(i).getTravelPacksListSize(); j++)
+			{
+				// checks if the client already went to the recommendation
+				if (getPackWithId(this->clientList.at(i).getTravelPackAt(j)).containsDestination(recommendation)) {
+					foundRecommendation = false;
+					break;
+				}
+			}
+
+			if (foundRecommendation) {
+
+				// searches for the available pack with the recommendation and prints it
+				for (size_t k = 0; k < this->packList.size(); k++) {
+
+					if (this->packList.at(k).containsDestination(recommendation) && this->packList.at(k).isAvailable()) {
+						cout << this->clientList.at(i).getName() << " recommended pack:" << endl;
+						cout << this->packList.at(k) << endl << endl;
+						break;
+					}
+				}
+
+			}
+			if (foundRecommendation) break;
+		}
+		// in case no available recommendation is possible
+		if (!foundRecommendation || !auxBool) {
+			cout << this->clientList.at(i).getName() << ':' << endl;
+			cout << "Recommendation for this client not available" << endl << endl;;
+		}
+
+		foundRecommendation = true;
+	}
+
 }
 
 // FILE OUTPUT METHODS
@@ -808,6 +875,16 @@ void Agency::generatePopularDestinations(std::multimap<int, string> & reversedPa
 				else
 					packMap[this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)] += 1;
 			}
+		}
+	}
+
+	// adds in packMap the places with 0 visitors
+	for (size_t a = 0; a < this->packList.size(); a++) {
+		for (size_t b = 0; b < this->packList.at(a).getDestinationsSize(); b++) {
+
+			if (packMap.find(this->packList.at(a).getDestinationAt(b)) == packMap.end())
+				packMap[this->packList.at(a).getDestinationAt(b)] = 0;
+
 		}
 	}
 
@@ -1259,14 +1336,14 @@ bool Agency::clientMap(std::map<int, int> & clientMap, int & clientCounter, cons
 	for (size_t i = 0; i < this->clientList.size(); i++)
 	{
 		clientCounter++;
-			if (printMap)
-			{
-				cout << "\t" << clientCounter << ". ";
-				this->clientList.at(i).printSummary();
-				cout << endl;
-			}
+		if (printMap)
+		{
+			cout << "\t" << clientCounter << ". ";
+			this->clientList.at(i).printSummary();
+			cout << endl;
+		}
 
-			clientMap.insert(pair<int, int>(clientCounter, this->clientList.at(i).getVAT()));
+		clientMap.insert(pair<int, int>(clientCounter, this->clientList.at(i).getVAT()));
 	}
 
 	return true;

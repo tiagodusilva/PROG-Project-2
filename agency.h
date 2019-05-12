@@ -153,6 +153,11 @@ public:
 	*/
 	void printMostVisitedDestinations(const int n) const;
 
+	/**
+		Prints the recommendation of a pack for all clients
+	*/
+	void printClientRecommendations() const;
+
 	// OTHER METHODS
 
 	/**
