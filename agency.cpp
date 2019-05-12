@@ -64,7 +64,7 @@ TravelPack Agency::getPackWithId(const int id) const {
 
 bool Agency::getAvaiabilityOfPackAtIndex(const int index)
 {
-	if (index >= (int) this->packList.size())
+	if (index >= (int)this->packList.size())
 		return false;
 	return this->packList.at(index).isAvailable();
 }
@@ -703,9 +703,6 @@ void Agency::printMostVisitedDestinations(int n) const {
 		for (size_t j = 0; j < this->clientList.at(i).getTravelPacksList().size(); j++) {
 
 			for (size_t k = 0; k < this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationsSize(); k++) {
-				
-				if (this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationsSize() > 1 && k==0)
-					continue;
 
 				if (packMap.find(this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)) == packMap.end())
 					packMap[this->getPackWithId(this->clientList.at(i).getTravelPacksList().at(j)).getDestinationAt(k)] = 1;
@@ -756,7 +753,7 @@ bool Agency::purchasePack(const int vat, const int id, const int tickets)
 		return false;
 	}
 
-	if (!pack->isAvailable()) { 
+	if (!pack->isAvailable()) {
 		cout << "Pack with ID \"" << id << "\" is unavailable" << endl;
 		return false;
 	}
@@ -820,7 +817,7 @@ bool Agency::removeClientByIndex(const int index)
 		return false;
 	}
 
-	if (index >= (int) this->clientList.size())
+	if (index >= (int)this->clientList.size())
 	{
 		cout << "Index out of range" << endl;
 		return false;
@@ -861,7 +858,7 @@ bool Agency::makePackUnavailableByIndex(const int index)
 		return false;
 	}
 
-	if (index >= (int) this->packList.size())
+	if (index >= (int)this->packList.size())
 	{
 		cout << "Index out of range" << endl;
 		return false;
@@ -1131,7 +1128,7 @@ bool Agency::isVatUsed(unsigned vat) const
 	return foundVat;
 }
 
-bool Agency::availablePackMap(std::map<int, int> & packMap, int & packsFound,const bool printMap) const
+bool Agency::availablePackMap(std::map<int, int> & packMap, int & packsFound, const bool printMap) const
 {
 	if (this->packList.empty())
 	{
@@ -1152,8 +1149,8 @@ bool Agency::availablePackMap(std::map<int, int> & packMap, int & packsFound,con
 				this->packList.at(i).printSummary();
 				cout << endl;
 			}
-			
-			packMap.insert(pair<int, int> (packsFound, this->packList.at(i).getId()));
+
+			packMap.insert(pair<int, int>(packsFound, this->packList.at(i).getId()));
 		}
 	}
 
