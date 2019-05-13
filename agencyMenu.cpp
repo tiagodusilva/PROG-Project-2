@@ -283,15 +283,14 @@ void viewPacks(const Agency & agency)
 	{
 		cout << "--------  View Packs  --------" << endl << endl;
 		printMenu({ "Previous Menu", // 0
-			"Only Avaiable", // 1
+			"Avaiable", // 1
 			"Avaiable Sorted by Destination", // 2
 			"Avaiable Sorted by Dates", // 3
 			"Avaiable Sorted by Destination and Dates", // 4
 			"All", // 5
 			"All sorted by Destination", // 6
 			"All sorted by Dates", // 7
-			"All sorted by Destination and Dates", // 8
-			"Sold to a specific Client" }); // 9
+			"All sorted by Destination and Dates" }); // 8
 
 		if (!cu::readInt(op, "Select Option"))
 			return;
