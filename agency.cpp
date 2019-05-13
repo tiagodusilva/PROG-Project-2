@@ -191,8 +191,8 @@ bool Agency::loadData(const std::string & agencyFileName, const bool isVerbose)
 	}
 	file.close();
 
-	if (isVerbose)
-		cout << "Agency data loaded correctly" << endl;
+	//if (isVerbose)
+	//	cout << "Agency data loaded correctly" << endl;
 
 	return true;
 }
@@ -358,7 +358,8 @@ bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker)
 	int n;
 	file >> n;
 	if (file.eof() || file.fail()) return false;
-	this->maxPackId = abs(n);
+	n = abs(n);
+	this->maxPackId = n;
 	lineTracker++;
 
 	while (true)
@@ -366,6 +367,13 @@ bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker)
 		TravelPack aux;
 		if (!this->readPackFromFile(file, aux, lineTracker))
 			return false;
+
+		// if a pack has an Id larger than the given maxPackId
+		if (abs(aux.getId()) > n)
+		{
+			lineTracker = 1;
+			return false;
+		}
 
 		this->packList.push_back(aux);
 
@@ -375,6 +383,7 @@ bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker)
 		file.ignore(1000, '\n');
 		lineTracker++;
 	}
+
 	return true;
 }
 
