@@ -160,7 +160,7 @@ bool Address::readUserInput()
 
 	do
 	{
-		if (!cu::readStr(s, "Door Numbers (XXXX-XXX)"))
+		if (!cu::readStr(s, "Zip Code (XXXX-XXX)"))
 			return false;
 	} while (!this->setZipCode(s));
 
