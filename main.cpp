@@ -6,9 +6,7 @@ using namespace std;
 
 int main()
 {
-	// TODO:
-	// Only missing the "What is the name of the Agency?" part
-	// At a later commit it may go into agencyMainMenu
+	// These 2 lines are needed to open the menu to the Agency agency
 	Agency agency;
 	agencyMainMenu(agency);
 
