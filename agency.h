@@ -239,12 +239,14 @@ private:
 	/**
 		Read one Client from file
 		Return false if it fails
+		Checks if read CLient's pack Ids are registered in the Agency
 	*/
 	bool readClientFromFile(std::ifstream & file, Client & client, unsigned & lineTracker);
 
 	/**
 		Reads one TravelPack from file
 		Returns false if it fails
+		Checks if read pack's Id is already registered in the Agency
 	*/
 	bool readPackFromFile(std::ifstream & fin, TravelPack & pack, unsigned & lineTracker);
 

@@ -1412,7 +1412,8 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 		while (true)
 		{
 			file >> num;
-			if (file.eof()) return false;
+			if (file.eof() || file.fail()) return false;
+			if (!this->isIdUsed(num)) return false;
 
 			travelPacks.push_back(num);
 
