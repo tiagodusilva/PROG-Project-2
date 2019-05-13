@@ -300,7 +300,6 @@ void viewPacks(const Agency & agency)
 
 		string s;
 		Date start, end;
-		int vat;
 		bool aborted = false;
 		switch (op)
 		{
@@ -630,45 +629,60 @@ void purchasePackMenu(Agency & agency)
 	char op;
 	if (selectClientMenu(agency, vat, "Client responsible for the Purchase"))
 	{
-		system("cls");
-		if (selectPackMenu(agency, id, "Pack to buy", true))
+		if (agency.isVatUsed(vat))
 		{
 			system("cls");
-			if (cu::readInt(tickets, "Number of tickets to buy"))
+			if (selectPackMenu(agency, id, "Pack to buy", true))
 			{
-				// Only enters if all operations were successful
-				system("cls");
-				cout << "Purchase details:" << endl << endl;
-				cout << "CLIENT:" << endl;
-				if (!agency.printClientByVAT(vat))
+				if (agency.isIdUsed(id))
 				{
-					cout << "Operation aborted";
-					cu::pauseConsole();
-					return;
-				}
-				cout << endl << "PACK:" << endl;
-				if (!agency.printPackById(id))
-				{
-					cout << "Operation aborted";
-					cu::pauseConsole();
-					return;
-				}
-				cout << "TICKETS: " << tickets << endl << endl;
+					system("cls");
+					if (cu::readInt(tickets, "Number of tickets to buy"))
+					{
+						// Only enters if all operations were successful
+						system("cls");
+						cout << "Purchase details:" << endl << endl;
+						cout << "CLIENT:" << endl;
+						if (!agency.printClientByVAT(vat))
+						{
+							cout << "Operation aborted";
+							cu::pauseConsole();
+							return;
+						}
+						cout << endl << "PACK:" << endl;
+						if (!agency.printPackById(id))
+						{
+							cout << "Operation aborted" << endl;
+							cu::pauseConsole();
+							return;
+						}
+						cout << "TICKETS: " << tickets << endl << endl;
 
-				if (!cu::readConfirmation(op, "Do you want to proceed with the Purchase"))
-				{
-					cout << "Operation aborted" << endl;
-					cu::pauseConsole();
-					return;
+						if (!cu::readConfirmation(op, "Do you want to proceed with the Purchase"))
+						{
+							cout << "Operation aborted" << endl;
+							cu::pauseConsole();
+							return;
+						}
+						if (op == 'y')
+						{
+							agency.purchasePack(vat, id, tickets);
+							cu::pauseConsole();
+							return;
+						}
+					}
 				}
-				if (op == 'y')
+				else
 				{
-					agency.purchasePack(vat, id, tickets);
-					cu::pauseConsole();
-					return;
+					cout << "Pack with id \"" << id << "\" not found" << endl;
 				}
 			}
 		}
+		else
+		{
+			cout << "Client with VAT \"" << vat << "\" not found" << endl;
+		}
+		
 	}
 
 	// Ends up here if any of the operations were unsuccessful
@@ -679,7 +693,7 @@ void purchasePackMenu(Agency & agency)
 
 void statisticsMenu(Agency & agency)
 {
-	int op = -1, vat;
+	int op = -1;
 	bool back = false;
 
 	while (!back)
@@ -817,7 +831,6 @@ void agencyMainMenu(Agency & agency)
 		if (op >= 0 && op <= 9)
 			system("cls");
 
-		int n;
 		// SWITCH STATEMENT HERE
 		switch (op)
 		{
