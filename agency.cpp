@@ -529,7 +529,7 @@ void Agency::printPacksSoldToEveryone() const
 			else
 				++it; // If not erased, we need to move the iterator to the next element
 		}
-	
+
 	}
 
 	if (packSet.empty())
@@ -725,7 +725,7 @@ void Agency::printPacksByDestinationAndDate(const string& s, const Date& start, 
 		// Also immediatly checks if the it's in the given Dates range
 		if ((!onlyAvailable || this->packList.at(i).isAvailable())
 			&& (start <= this->packList.at(i).getDeparture()
-			&& end >= this->packList.at(i).getReturn())
+				&& end >= this->packList.at(i).getReturn())
 			&& this->packList.at(i).containsDestination(sl))
 		{
 			if (count == 0)
@@ -784,8 +784,9 @@ void Agency::printMostVisitedDestinations(const int n) const {
 	}
 }
 
-void Agency::printClientRecommendations() const {
+void Agency::printClientRecommendations(const int n) const {
 
+	int auxInt;
 	bool foundRecommendation = true;
 	bool auxBool = false;
 	string recommendation;
@@ -793,7 +794,13 @@ void Agency::printClientRecommendations() const {
 
 	this->generatePopularDestinations(reversedPackMap);
 
+	if (n <= 0) {
+		cout << "No possible recommendations" << endl;	return;
+	}
+
 	for (size_t i = 0; i < this->clientList.size(); i++) {
+		
+		auxInt = 1;
 
 		for (auto iter = reversedPackMap.rbegin(); iter != reversedPackMap.rend(); ++iter) {
 
@@ -831,9 +838,11 @@ void Agency::printClientRecommendations() const {
 						break;
 					}
 				}
-
 			}
 			if (foundRecommendation) break;
+
+			auxInt++;
+			if (n + 1 == auxInt) break;
 		}
 		// in case no available recommendation is possible
 		if (!foundRecommendation || !auxBool) {
@@ -843,7 +852,6 @@ void Agency::printClientRecommendations() const {
 
 		foundRecommendation = true;
 	}
-
 }
 
 // FILE OUTPUT METHODS
@@ -1111,8 +1119,7 @@ bool Agency::changeClient(const unsigned vat) {
 		return false;
 	}
 
-	cout << "Client changed successfully" << endl;
-	cu::pauseConsole();
+	//cout << "Client changed successfully" << endl;   // agr----
 
 	return true;
 }

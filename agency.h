@@ -156,7 +156,7 @@ public:
 	/**
 		Prints the recommendation of a pack for all clients
 	*/
-	void printClientRecommendations() const;
+	void printClientRecommendations(const int n) const;
 
 	// OTHER METHODS
 

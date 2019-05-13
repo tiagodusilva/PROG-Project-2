@@ -291,7 +291,7 @@ void viewPacks(const Agency & agency)
 			"All sorted by Destination", // 6
 			"All sorted by Dates", // 7
 			"All sorted by Destination and Dates", // 8
-			"Sold to a specific Client"}); // 9
+			"Sold to a specific Client" }); // 9
 
 		if (!cu::readInt(op, "Select Option"))
 			return;
@@ -536,7 +536,7 @@ void manageClients(Agency & agency)
 
 		case 2: // Change Client
 			if (selectClientMenu(agency, vat, "Remove Client"))
-			{			
+			{
 				cout << endl;
 				if (agency.changeClient(vat))
 					cout << "Client changed successfully" << endl;
@@ -671,7 +671,7 @@ void purchasePackMenu(Agency & agency)
 			}
 		}
 	}
-	 
+
 	// Ends up here if any of the operations were unsuccessful
 	cout << "Operation aborted" << endl;
 	cu::pauseConsole();
@@ -689,7 +689,7 @@ void statisticsMenu(Agency & agency)
 		printMenu({ "Previous Menu", // 0
 			"Show statistics", // 1
 			"Most visited Destinations", // 2
-			"Client Recommendations"}); // 3
+			"Client Recommendations" }); // 3
 
 		if (!cu::readInt(op, "Select Option"))
 			return;
@@ -724,18 +724,19 @@ void statisticsMenu(Agency & agency)
 			cout << endl;
 			agency.printMostVisitedDestinations(n);
 			cu::pauseConsole();
+			break;
 
 		case 3: // Client Pack Recommendations
 			cout << "--------  Client Recommendations  --------" << endl << endl;
-			//if (!cu::readInt(n, "How many destinations to focus the search"))
-			//{
-			//	cout << "Operation aborted" << endl;
-			//	cu::pauseConsole();
-			//	break;
-			//}
+			if (!cu::readInt(n, "How many destinations to focus the search"))
+			{
+				cout << "Operation aborted" << endl;
+				cu::pauseConsole();
+				break;
+			}
 
 			cout << endl;
-			agency.printClientRecommendations();
+			agency.printClientRecommendations(n);
 			cu::pauseConsole();
 			break;
 
