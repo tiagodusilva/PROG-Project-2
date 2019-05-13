@@ -533,7 +533,7 @@ void manageClients(Agency & agency)
 			break;
 
 		case 2: // Change Client
-			if (selectClientMenu(agency, vat, "Remove Client"))
+			if (selectClientMenu(agency, vat, "Change Client"))
 			{
 				cout << endl;
 				if (agency.changeClient(vat))
@@ -656,7 +656,7 @@ void purchasePackMenu(Agency & agency)
 							cu::pauseConsole();
 							return;
 						}
-						cout << "TICKETS: " << tickets << endl << endl;
+						cout << endl << "TICKETS: " << tickets << endl << endl;
 
 						if (!cu::readConfirmation(op, "Do you want to proceed with the Purchase"))
 						{
