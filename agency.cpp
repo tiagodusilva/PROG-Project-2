@@ -200,26 +200,26 @@ bool Agency::loadData(const std::string & agencyFileName, const bool isVerbose)
 bool Agency::readAgencyFromFile(ifstream & file, unsigned & lineTracker) {
 	Address address;
 
-	getline(file, name);
+	getline(file, this->name);
 	if (file.eof()) return false;
 	lineTracker++;
 
-	file >> vat;
+	file >> this->vat;
 	if (file.eof()) return false;
 	file.ignore(1000, '\n');
 	lineTracker++;
 
-	getline(file, url);
+	getline(file, this->url);
 	if (file.eof()) return false;
 	lineTracker++;
 
-	if (!address.readFromFile(file, lineTracker)) return false;
+	if (!this->address.readFromFile(file, lineTracker)) return false;
 
-	getline(file, fileNameClients);
+	getline(file, this->fileNameClients);
 	if (file.eof()) return false;
 	lineTracker++;
 
-	getline(file, fileNamePacks);
+	getline(file, this->fileNamePacks);
 	lineTracker++;
 
 	return true;
@@ -1398,8 +1398,13 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 	lineTracker++;
 	file.ignore(1000, '\n');
 
-	if (!auxAddress.readFromFile(file, lineTracker) || !client.setAddress(auxAddress)) return false;
-	// Auto updates lineTracker
+	if (!auxAddress.readFromFile(file, lineTracker))
+		return false;
+	if (!client.setAddress(auxAddress))
+	{
+		--lineTracker; // Decrease lineTracker to the correct line before exiting
+		return false;
+	}
 
 	if (file.peek() != '-')
 	{
@@ -1500,10 +1505,22 @@ bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned & 
 	if (!pack.setDestinations(destinations)) return false;
 	lineTracker++;
 
-	if (!date.readFromFile(fin, lineTracker) || !pack.setDeparture(date)) return false;
+	if (!date.readFromFile(fin, lineTracker))
+		return false;
+	if (!pack.setDeparture(date))
+	{
+		--lineTracker; // Decrease lineTracker to the correct line before exiting
+		return false;
+	}
 	// Auto updates lineTracker
 
-	if (!date.readFromFile(fin, lineTracker) || !pack.setReturn(date)) return false;
+	if (!date.readFromFile(fin, lineTracker))
+		return false;
+	if (!pack.setReturn(date))
+	{
+		--lineTracker; // Decrease lineTracker to the correct line before exiting
+		return false;
+	}
 	// Auto updates lineTracker
 
 	fin >> n;
