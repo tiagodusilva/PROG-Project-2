@@ -202,9 +202,14 @@ public:
 	bool changePack(const int id);
 
 	/**
-		Returns true if a given VAT is already registered to a Client
+		Returns true if a given client VAT is already registered to a Client
 	*/
-	bool isVatUsed(unsigned vat) const;
+	bool isVatUsed(const unsigned vat) const;
+
+	/**
+		Returns true if a given Pack Id is already registered by a pack
+	*/
+	bool isIdUsed(const int id) const;
 
 	/**
 		Creates a map with <option, packId> of all Packs

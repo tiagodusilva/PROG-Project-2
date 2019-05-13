@@ -127,7 +127,7 @@ bool Agency::setPackets(std::vector<TravelPack> & new_packList) {
 bool Agency::loadData(const std::string & agencyFileName, const bool isVerbose)
 {
 	ifstream file;
-	unsigned lineTracker = 0;
+	unsigned lineTracker = 1;
 	file.open(agencyFileName);
 	if (!file) // if file does not exist
 	{
@@ -162,7 +162,7 @@ bool Agency::loadData(const std::string & agencyFileName, const bool isVerbose)
 		exit(42);
 		return false; // Should never execute
 	}
-	lineTracker = 0;
+	lineTracker = 1;
 	if (!this->readAllPacksFromFile(file, lineTracker))
 	{
 		if (isVerbose)
@@ -181,7 +181,7 @@ bool Agency::loadData(const std::string & agencyFileName, const bool isVerbose)
 		exit(42);
 		return false; // Should never execute
 	}
-	lineTracker = 0;
+	lineTracker = 1;
 	if (!this->readAllClientsFromFile(file, lineTracker))
 	{
 		if (isVerbose)
@@ -226,6 +226,7 @@ bool Agency::readAgencyFromFile(ifstream & file, unsigned & lineTracker) {
 }
 
 bool Agency::readNewClientUserInput() {
+	int n;
 	string str;
 	Client newClient;
 	Address auxAddress;
@@ -235,12 +236,12 @@ bool Agency::readNewClientUserInput() {
 	} while (!newClient.setName(str));
 
 	do {
-		if (!cu::readStr(str, "VAT")) return false;
-	} while (!newClient.setVAT(stoi(str), clientList));
+		if (!cu::readInt(n, "VAT")) return false;
+	} while (!newClient.setVAT(n, clientList));
 
 	do {
-		if (!cu::readStr(str, "Household")) return false;
-	} while (!newClient.setHousehold(stoi(str)));
+		if (!cu::readInt(n, "Household")) return false;
+	} while (!newClient.setHousehold(n));
 
 	do
 	{
@@ -276,6 +277,7 @@ bool Agency::readAllClientsFromFile(std::ifstream & file, unsigned & lineTracker
 			break;
 
 		file.ignore(1000, '\n');
+		lineTracker++;
 	}
 	return true;
 }
@@ -371,6 +373,7 @@ bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker)
 			break;
 
 		file.ignore(1000, '\n');
+		lineTracker++;
 	}
 	return true;
 }
@@ -1278,7 +1281,7 @@ bool Agency::changePack(const int id)
 	return true;
 }
 
-bool Agency::isVatUsed(unsigned vat) const
+bool Agency::isVatUsed(const unsigned vat) const
 {
 	bool foundVat = false;
 
@@ -1292,6 +1295,23 @@ bool Agency::isVatUsed(unsigned vat) const
 	}
 
 	return foundVat;
+}
+
+bool Agency::isIdUsed(const int id) const
+{
+	int auxId = abs(id);
+	bool foundId = false;
+
+	for (size_t i = 0; i < this->packList.size(); i++)
+	{
+		if (auxId == abs(this->packList.at(i).getId()))
+		{
+			foundId = true;
+			break;
+		}
+	}
+
+	return foundId;
 }
 
 bool Agency::packMap(std::map<int, int> & packMap, int & packsFound, const bool onlyAvailable, const bool printMap) const
@@ -1379,6 +1399,7 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 	file.ignore(1000, '\n');
 
 	if (!auxAddress.readFromFile(file, lineTracker) || !client.setAddress(auxAddress)) return false;
+	// Auto updates lineTracker
 
 	if (file.peek() != '-')
 	{
@@ -1436,9 +1457,8 @@ bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned & 
 	string s;
 	Date date;
 
-	// TODO: Verify if the ID hasn't been used yet
 	fin >> n;
-	if (fin.eof() || fin.fail() || !pack.setId(n))
+	if (fin.eof() || fin.fail() || !pack.setId(n) || this->isIdUsed(n))
 		return false;
 	lineTracker++;
 
@@ -1481,10 +1501,10 @@ bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned & 
 	lineTracker++;
 
 	if (!date.readFromFile(fin, lineTracker) || !pack.setDeparture(date)) return false;
-	lineTracker++;
+	// Auto updates lineTracker
 
 	if (!date.readFromFile(fin, lineTracker) || !pack.setReturn(date)) return false;
-	lineTracker++;
+	// Auto updates lineTracker
 
 	fin >> n;
 	if (fin.eof() || fin.fail() || !pack.setPrice(n)) return false;
