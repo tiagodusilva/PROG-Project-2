@@ -19,43 +19,69 @@ Date::Date(unsigned int aYear, unsigned int aMonth, unsigned int aDay)
     day = aDay;
 }
 
-Date::Date(const string& s)
+Date::Date(const string& s, bool & isValid)
 {
-	int start = 0, end = s.find('/');
-	string sub;
-	if (end != string::npos)
+	try
 	{
-		sub = s.substr(0, end);
-		cu::strTrim(sub);
-		this->year = stoi(s);
-
-		start = end + 1;
-		end = s.find('/', start);
+		int start = 0, end = s.find('/');
+		string sub;
 		if (end != string::npos)
 		{
-			sub = s.substr(start, end - start);
+			sub = s.substr(0, end);
 			cu::strTrim(sub);
-			this->month = stoi(sub);
+			this->year = stoi(s);
 
-			sub = s.substr(end + 1, string::npos);
-			cu::strTrim(sub);
-			this->day = stoi(sub);
+			start = end + 1;
+			end = s.find('/', start);
+			if (end != string::npos)
+			{
+				sub = s.substr(start, end - start);
+				cu::strTrim(sub);
+				this->month = stoi(sub);
 
-			return;
+				sub = s.substr(end + 1, string::npos);
+				cu::strTrim(sub);
+				this->day = stoi(sub);
+
+				isValid = this->isValid();
+				return;
+			}
 		}
 	}
+	catch (std::exception& e) {} // Does nothing on purpuose
 
 	// Only executes if a verification has failed above
 	this->year = 0;
 	this->month = 0;
 	this->day = 0;
+	isValid = false;
+
 }
 
+#pragma region GETTERS
+
+unsigned int Date::getDay() const
+{
+	return day;
+}
+
+unsigned int Date::getMonth() const
+{
+	return month;
+}
+
+unsigned int Date::getYear() const
+{
+	return year;
+}
+
+#pragma endregion
+
+// OTHER PUBLIC METHODS
+
+// WARNING: Date::now() is compiler dependent
 Date Date::now()
 {
-
-		// God Bless Marantes
-
 		/* current date/time based on current system */
 
 		/* LocalTime for MinGW compiler */
@@ -67,6 +93,10 @@ Date Date::now()
 		tm* ltm = new tm();
 		localtime_s(ltm, &now);
 
+		// Localtime_s returns time in a specific form.
+		// Year is number of years since 1900
+		// Month is number of month [0, 11] starting in January
+		// Day is already correct [1, 31]
 		Date currentDate = Date( 1900 + ltm->tm_year, 1 + ltm->tm_mon, ltm->tm_mday );
 		return currentDate;
 }
@@ -101,33 +131,14 @@ bool Date::readFromFile(ifstream& fin, unsigned int& lineTracker)
 	getline(fin, s);
 	if (fin.eof() || fin.fail()) return false;
 
-	*this = Date(s);
+	bool isValid;
+	*this = Date(s, isValid);
 
-	if (!this->isValid())
-		return false;
+	if (!isValid) return false;
 	
 	lineTracker++;
 	return true;
 }
-
-#pragma region GETTERS
-
-unsigned int Date::getDay() const
-{
-    return day;
-}
-
-unsigned int Date::getMonth() const
-{
-    return month;
-}
-
-unsigned int Date::getYear() const
-{
-    return year;
-}
-
-#pragma endregion
 
 ostream& operator<< (ostream& stream, const Date& date)
 {
