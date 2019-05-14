@@ -55,16 +55,21 @@ bool selectPackMenu(const Agency & agency, int & id, const string & menuTitle, c
 
 	while (true)
 	{
+		op = -1;
+
 		cout << "--------  " << menuTitle << "  --------" << endl << endl;
 		printMenu({ "Previous Menu", // 0
 			"Insert Pack's Id", // 1
 			"Select Pack from List" }); // 2
 
-		if (!cu::readInt(op, "Select Option"))
-			return false;
 
-		if (op >= 0 && op <= 2)
-			cu::clearConsole();
+		while (op < 0 || op > 2)
+		{
+			if (!cu::readInt(op, "Select Option"))
+				return false;
+		}
+
+		cu::clearConsole();
 
 		map<int, int> packMap;
 		int packsFound;
@@ -138,16 +143,21 @@ bool selectClientMenu(const Agency & agency, int & vat, const string & menuTitle
 
 	while (true)
 	{
+		op = -1;
+
 		cout << "--------  " << menuTitle << "  --------" << endl << endl;
 		printMenu({ "Previous Menu", // 0
 			"Insert Client's VAT", // 1
 			"Select from List" }); // 2
 
-		if (!cu::readInt(op, "Select Option"))
-			return false;
 
-		if (op >= 0 && op <= 2)
-			cu::clearConsole();
+		while (op < 0 || op > 2)
+		{
+			if (!cu::readInt(op, "Select Option"))
+				return false;
+		}
+		
+		cu::clearConsole();
 
 		// map <option, vat>
 		map<int, int> clientMap;
@@ -218,17 +228,22 @@ void viewPacksSoldMenu(Agency & agency)
 
 	while (!back)
 	{
+		op = -1;
+
 		cout << "--------  View Packs sold to Clients  --------" << endl << endl;
 		printMenu({ "Previous Menu", // 0
 			"Packs sold to all Clients", // 1
 			"Packs sold at least once", // 2
 			"Packs sold to a specific Client", }); // 3
 
-		if (!cu::readInt(op, "Select Option"))
-			return;
 
-		if (op >= 0 && op <= 3)
-			cu::clearConsole();
+		while (op < 0 || op > 3)
+		{
+			if (!cu::readInt(op, "Select Option"))
+				return;
+		}
+
+		cu::clearConsole();
 
 		int vat;
 		switch (op)
@@ -281,6 +296,8 @@ void viewPacks(const Agency & agency)
 
 	while (!back)
 	{
+		op = -1;
+
 		cout << "--------  View Packs  --------" << endl << endl;
 		printMenu({ "Previous Menu", // 0
 			"Avaiable", // 1
@@ -292,11 +309,14 @@ void viewPacks(const Agency & agency)
 			"All sorted by Dates", // 7
 			"All sorted by Destination and Dates" }); // 8
 
-		if (!cu::readInt(op, "Select Option"))
-			return;
 
-		if (op >= 0 && op <= 8)
-			cu::clearConsole();
+		while (op < 0 || op > 8)
+		{
+			if (!cu::readInt(op, "Select Option"))
+				return;
+		}
+		
+		cu::clearConsole();
 
 		string s;
 		Date start, end;
@@ -457,16 +477,21 @@ void viewClients(const Agency & agency)
 
 	while (!back)
 	{
+		op = -1;
+
 		cout << "--------  View Clients  --------" << endl << endl;
 		printMenu({ "Previous Menu", // 0
 			"All", // 1
 			"Specific Client" }); // 2
 
-		if (!cu::readInt(op, "Select Option"))
-			return;
 
-		if (op >= 0 && op <= 2)
-			cu::clearConsole();
+		while (op < 0 || op > 2)
+		{
+			if (!cu::readInt(op, "Select Option"))
+				return;
+		}
+
+		cu::clearConsole();
 
 		switch (op)
 		{
@@ -505,17 +530,22 @@ void manageClients(Agency & agency)
 
 	while (!back)
 	{
+		op = -1;
+
 		cout << "--------  Manage Clients  --------" << endl << endl;
 		printMenu({ "Previous Menu", // 0
 			"Add new Client", // 1
 			"Change Client", // 2
 			"Remove Client" }); // 3
 
-		if (!cu::readInt(op, "Select Option"))
-			return;
 
-		if (op >= 0 && op <= 3)
-			cu::clearConsole();
+		while (op < 0 || op > 3)
+		{
+			if (!cu::readInt(op, "Select Option"))
+				return;
+		}
+			
+		cu::clearConsole();
 
 		switch (op)
 		{
@@ -569,17 +599,22 @@ void managePacks(Agency & agency)
 
 	while (!back)
 	{
+		op = -1;
+
 		cout << "--------  Manage Packs  --------" << endl << endl;
 		printMenu({ "Previous Menu", // 0
 			"Add new Pack", // 1
 			"Change Pack", // 2
 			"Make Pack Unavailable" }); // 3
 
-		if (!cu::readInt(op, "Select Option"))
-			return;
 
-		if (op >= 0 && op <= 3)
-			cu::clearConsole();
+		while (op < 0 || op > 3)
+		{
+			if (!cu::readInt(op, "Select Option"))
+				return;
+		}
+
+		cu::clearConsole();
 
 		switch (op)
 		{
@@ -698,18 +733,22 @@ void statisticsMenu(Agency & agency)
 
 	while (!back)
 	{
+		op = -1;
+
 		cout << "--------  Agency Statistics  --------" << endl << endl;
 		printMenu({ "Previous Menu", // 0
 			"Show statistics", // 1
 			"Most visited Destinations", // 2
 			"Client Recommendations" }); // 3
 
-		if (!cu::readInt(op, "Select Option"))
-			return;
 
-		if (op >= 0 && op <= 3)
-			cu::clearConsole();
+		while (op < 0 || op > 3)
+		{
+			if (!cu::readInt(op, "Select Option"))
+				return;
+		}
 
+		cu::clearConsole();
 
 		int n;
 		switch (op)
@@ -806,6 +845,7 @@ void agencyMainMenu(Agency & agency)
 
 	while (!stopProgram)
 	{
+		op = -1;
 		cu::clearConsole();
 
 		// Imprime o menu principal
@@ -822,14 +862,16 @@ void agencyMainMenu(Agency & agency)
 
 		cout << "At any point enter Ctrl+Z to cancel or to go back to a previous menu\n" << endl;
 
-		if (!cu::readInt(op, "Insert option"))
+		while (op < 0 || op > 9)
 		{
-			confirmSaveData(agency);
-			return;
+			if (!cu::readInt(op, "Insert option"))
+			{
+				confirmSaveData(agency);
+				return;
+			}
 		}
 
-		if (op >= 0 && op <= 9)
-			cu::clearConsole();
+		cu::clearConsole();
 
 		// SWITCH STATEMENT HERE
 		switch (op)

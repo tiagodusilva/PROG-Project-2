@@ -191,8 +191,8 @@ bool Agency::loadData(const std::string & agencyFileName, const bool isVerbose)
 	}
 	file.close();
 
-	//if (isVerbose)
-	//	cout << "Agency data loaded correctly" << endl;
+	if (isVerbose)
+		cout << "Agency data loaded correctly" << endl;
 
 	return true;
 }

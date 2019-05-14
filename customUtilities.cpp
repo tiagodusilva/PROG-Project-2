@@ -128,11 +128,15 @@ namespace cu
 
 	void pauseConsole()
 	{
-		system("pause");
+		string trash;
+		cout << "Press Enter to continue..." << endl;
+		getline(cin, trash);
 	}
 
 	void clearConsole()
 	{
-		system("cls");
+		// Most portable way without using system(), conio.h, ncurses or an OS specific implementation
+		// Saldy just moves everything up 40 lines...
+		cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
 	}
 }
