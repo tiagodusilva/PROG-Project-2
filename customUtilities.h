@@ -79,11 +79,17 @@ namespace cu
 	*/
 	bool readConfirmation(char& c, const std::string msg);
 
-	/*
+	/**
 		Pauses the program's execution and waits for any user input
 		Actual method for that may change in the future
 	*/
 	void pauseConsole();
+
+	/**
+		Clear the console... or somthing similar in effect
+		Method may change in the future
+	*/
+	void clearConsole();
 }
 
 #endif

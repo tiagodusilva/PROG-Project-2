@@ -130,4 +130,9 @@ namespace cu
 	{
 		system("pause");
 	}
+
+	void clearConsole()
+	{
+		system("cls");
+	}
 }

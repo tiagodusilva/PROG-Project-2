@@ -1067,7 +1067,7 @@ bool Agency::changeClient(const unsigned vat) {
 
 	while (true)
 	{
-		system("cls");
+		cu::clearConsole();
 		cout << "  Possible fields to change" << endl;
 		cout << "\t1. Name" << endl << "\t2. VAT" << endl << "\t3. Household" << endl
 			<< "\t4. Address" << endl << "\t0. Cancel" << endl;
@@ -1083,7 +1083,7 @@ bool Agency::changeClient(const unsigned vat) {
 		}
 	}
 
-	system("cls");
+	cu::clearConsole();
 
 	switch (num)
 	{
@@ -1158,7 +1158,7 @@ bool Agency::changePack(const int id)
 	int aux;
 	while (true)
 	{
-		system("cls");
+		cu::clearConsole();
 		cout << "  Possible fields to change" << endl;
 		cout << "\t1. Destinations" << endl << "\t2. Departure Date" << endl << "\t3. Return Date" << endl
 			<< "\t4. Price" << endl << "\t5. Maximum Bookings" << endl << "\t0. Cancel" << endl;
@@ -1174,7 +1174,7 @@ bool Agency::changePack(const int id)
 		}
 	}
 
-	system("cls");
+	cu::clearConsole();
 
 	Date aDate;
 	string s;

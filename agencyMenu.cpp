@@ -64,7 +64,7 @@ bool selectPackMenu(const Agency & agency, int & id, const string & menuTitle, c
 			return false;
 
 		if (op >= 0 && op <= 2)
-			system("cls");
+			cu::clearConsole();
 
 		map<int, int> packMap;
 		int packsFound;
@@ -126,7 +126,7 @@ bool selectPackMenu(const Agency & agency, int & id, const string & menuTitle, c
 			break;
 		}
 
-		system("cls");
+		cu::clearConsole();
 	} // End while (!back)}
 
 	return false; // Should never get here
@@ -147,7 +147,7 @@ bool selectClientMenu(const Agency & agency, int & vat, const string & menuTitle
 			return false;
 
 		if (op >= 0 && op <= 2)
-			system("cls");
+			cu::clearConsole();
 
 		// map <option, vat>
 		map<int, int> clientMap;
@@ -207,7 +207,7 @@ bool selectClientMenu(const Agency & agency, int & vat, const string & menuTitle
 			break;
 		}
 
-		system("cls");
+		cu::clearConsole();
 	} // End while (!back)
 }
 
@@ -228,7 +228,7 @@ void viewPacksSoldMenu(Agency & agency)
 			return;
 
 		if (op >= 0 && op <= 3)
-			system("cls");
+			cu::clearConsole();
 
 		int vat;
 		switch (op)
@@ -254,7 +254,7 @@ void viewPacksSoldMenu(Agency & agency)
 		case 3:
 			if (selectClientMenu(agency, vat, "Packs sold to a Client"))
 			{
-				system("cls");
+				cu::clearConsole();
 				cout << "Packs sold to Client:" << endl << endl;
 				agency.printPacksByClient(vat);
 				cout << endl;
@@ -268,7 +268,7 @@ void viewPacksSoldMenu(Agency & agency)
 			break;
 		}
 
-		system("cls");
+		cu::clearConsole();
 
 	} // End while (!back)
 
@@ -296,7 +296,7 @@ void viewPacks(const Agency & agency)
 			return;
 
 		if (op >= 0 && op <= 8)
-			system("cls");
+			cu::clearConsole();
 
 		string s;
 		Date start, end;
@@ -446,7 +446,7 @@ void viewPacks(const Agency & agency)
 			break;
 		}
 
-		system("cls");
+		cu::clearConsole();
 	} // End while (!back)
 }
 
@@ -466,7 +466,7 @@ void viewClients(const Agency & agency)
 			return;
 
 		if (op >= 0 && op <= 2)
-			system("cls");
+			cu::clearConsole();
 
 		switch (op)
 		{
@@ -494,7 +494,7 @@ void viewClients(const Agency & agency)
 			break;
 		}
 
-		system("cls");
+		cu::clearConsole();
 	} // End while (!back)
 }
 
@@ -515,7 +515,7 @@ void manageClients(Agency & agency)
 			return;
 
 		if (op >= 0 && op <= 3)
-			system("cls");
+			cu::clearConsole();
 
 		switch (op)
 		{
@@ -558,7 +558,7 @@ void manageClients(Agency & agency)
 			break;
 		}
 
-		system("cls");
+		cu::clearConsole();
 	} // End while (!back)
 }
 
@@ -579,7 +579,7 @@ void managePacks(Agency & agency)
 			return;
 
 		if (op >= 0 && op <= 3)
-			system("cls");
+			cu::clearConsole();
 
 		switch (op)
 		{
@@ -619,7 +619,7 @@ void managePacks(Agency & agency)
 			break;
 		}
 
-		system("cls");
+		cu::clearConsole();
 	} // End while (!back)
 }
 
@@ -631,16 +631,16 @@ void purchasePackMenu(Agency & agency)
 	{
 		if (agency.isVatUsed(vat))
 		{
-			system("cls");
+			cu::clearConsole();
 			if (selectPackMenu(agency, id, "Pack to buy", true))
 			{
 				if (agency.isIdUsed(id))
 				{
-					system("cls");
+					cu::clearConsole();
 					if (cu::readInt(tickets, "Number of tickets to buy"))
 					{
 						// Only enters if all operations were successful
-						system("cls");
+						cu::clearConsole();
 						cout << "Purchase details:" << endl << endl;
 						cout << "CLIENT:" << endl;
 						if (!agency.printClientByVAT(vat))
@@ -708,7 +708,7 @@ void statisticsMenu(Agency & agency)
 			return;
 
 		if (op >= 0 && op <= 3)
-			system("cls");
+			cu::clearConsole();
 
 
 		int n;
@@ -759,7 +759,7 @@ void statisticsMenu(Agency & agency)
 			break;
 		}
 
-		system("cls");
+		cu::clearConsole();
 	} // End while (!back)
 }
 
@@ -806,7 +806,7 @@ void agencyMainMenu(Agency & agency)
 
 	while (!stopProgram)
 	{
-		system("cls");
+		cu::clearConsole();
 
 		// Imprime o menu principal
 		cout << "--------  Main Menu  --------" << endl << endl;
@@ -829,7 +829,7 @@ void agencyMainMenu(Agency & agency)
 		}
 
 		if (op >= 0 && op <= 9)
-			system("cls");
+			cu::clearConsole();
 
 		// SWITCH STATEMENT HERE
 		switch (op)
@@ -878,7 +878,7 @@ void agencyMainMenu(Agency & agency)
 
 	} // End while(!stopProgram)
 
-	system("cls");
+	cu::clearConsole();
 	confirmSaveData(agency);
 }
 
