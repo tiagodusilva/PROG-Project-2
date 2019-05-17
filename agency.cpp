@@ -332,8 +332,9 @@ bool Agency::readNewPackUserInput()
 			return false;
 	} while (!pack.setMaxBookings(n));
 
-	pack.setId(this->maxPackId);
-	this->maxPackId++;
+	pack.setId(++this->maxPackId);
+
+	this->packList.push_back(pack);
 
 	return true;
 }
