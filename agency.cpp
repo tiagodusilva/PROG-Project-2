@@ -219,6 +219,7 @@ bool Agency::readNewClientUserInput() {
 	string str;
 	Client newClient;
 	Address auxAddress;
+	bool fail;
 
 	do {
 		if (!cu::readStr(str, "Name")) return false;
@@ -226,11 +227,23 @@ bool Agency::readNewClientUserInput() {
 
 	do {
 		if (!cu::readUnsigned(u, "VAT")) return false;
-	} while (this->isVatUsed(u) || !newClient.setVAT(u));
+		fail = this->isVatUsed(u);
+		if (fail)
+		{
+			cout << "VAT is already registered to another Client" << endl;
+			continue;
+		}
+		fail = fail || !newClient.setVAT(u);
+		if (fail)
+			cout << "VAT must be a positive integer" << endl;
+	} while (fail);
 
 	do {
 		if (!cu::readUnsigned(u, "Household")) return false;
-	} while (!newClient.setHousehold(u));
+		fail = !newClient.setHousehold(u);
+		if (fail)
+			cout << "Household must be an integer larger than 1" << endl;
+	} while (fail);
 
 	do
 	{
@@ -285,6 +298,7 @@ bool Agency::readNewPackUserInput()
 	vector<string> destinations = {};
 	Date date;
 	TravelPack pack;
+	bool fail;
 
 	if (!cu::readStr(s, "Main destination"))
 		return false;
@@ -320,20 +334,29 @@ bool Agency::readNewPackUserInput()
 		cout << "Return date:" << endl;
 		if (!date.readUserInput())
 			return false;
-	} while (!pack.setReturn(date));
+		fail = !pack.setReturn(date);
+		if (fail)
+			cout << "Return Date must be before departure Date" << endl;
+	} while (fail);
 
 	do
 	{
 		if (!cu::readInt(n, "Price"))
 			return false;
-	} while (!pack.setPrice(n));
+		fail = !pack.setPrice(n);
+		if (fail)
+			cout << "Price must be a postive integer" << endl;
+	} while (fail);
 
 	pack.setCurrentBookings(0);
 	do
 	{
 		if (!cu::readInt(n, "Maximum bookings"))
 			return false;
-	} while (!pack.setMaxBookings(n));
+		fail = !pack.setMaxBookings(n);
+		if (fail)
+			cout << "Maximum bookings must be an integer larger than 1" << endl;
+	} while (fail);
 
 	pack.setId(++this->maxPackId);
 

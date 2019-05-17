@@ -119,6 +119,8 @@ bool Date::readUserInput()
 
 		*this = Date(y, m, d);
 		fail = !this->isValid();
+		if (fail)
+			cout << "Date invalid (example: 2019/05/32)" << endl;
 	} while (fail);
 
 	return true;

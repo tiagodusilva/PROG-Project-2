@@ -127,6 +127,7 @@ bool Address::readUserInput()
 {
 	// cout << "Input Ctrl + Z at any point to interrupt the input" << endl;
 	string s;
+	bool fail;
 
 	do
 	{
@@ -136,9 +137,12 @@ bool Address::readUserInput()
 
 	do
 	{
-		if (!cu::readStr(s, "Door Numbers"))
+		if (!cu::readStr(s, "Door Number"))
 			return false;
-	} while (!this->setDoorNumber(s));
+		fail = !this->setDoorNumber(s);
+		if (fail)
+			cout << "Door number must be a positive integer" << endl;
+	} while (fail);
 
 	char c;
 
@@ -162,7 +166,10 @@ bool Address::readUserInput()
 	{
 		if (!cu::readStr(s, "Zip Code (XXXX-XXX)"))
 			return false;
-	} while (!this->setZipCode(s));
+		fail = !this->setZipCode(s);
+		if (fail)
+			cout << "Zip code must be in format XXXX-XXX (ex. 1234-567)" << endl;
+	} while (fail);
 
 	do
 	{
