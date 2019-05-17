@@ -236,3 +236,7 @@ std::ofstream& operator<<(std::ofstream& stream, const TravelPack& pack)
 	stream << pack.currentBookings;
 	return stream;
 }
+
+// T1G02
+// up201800170 Breno Accioly
+// up201806516 Tiago Silva

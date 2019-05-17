@@ -77,3 +77,7 @@ private:
 std::ostream& operator<< (std::ostream& stream, const Date& date);
 
 #endif // DATE_H
+
+// T1G02
+// up201800170 Breno Accioly
+// up201806516 Tiago Silva
