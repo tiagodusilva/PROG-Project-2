@@ -207,7 +207,8 @@ bool Agency::readAgencyFromFile(ifstream & file, unsigned & lineTracker, std::st
 	lineTracker++;
 
 	getline(file, this->fileNamePacks);
-	if (!cu::checkStream(file, error)) return false;
+	// The next line would make it mandatory to have a newLine at the end of the file
+	// if (!cu::checkStream(file, error)) return false;
 	lineTracker++;
 
 	return true;
@@ -265,7 +266,9 @@ bool Agency::readAllClientsFromFile(std::ifstream & file, unsigned & lineTracker
 
 		this->clientList.push_back(aux);
 
-		cout << "_" << (char)file.peek() << "_" << endl;
+		if (file.eof())
+			break;
+
 		if (file.peek() != ':')
 			break;
 
@@ -376,6 +379,9 @@ bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker, 
 		}
 
 		this->packList.push_back(aux);
+
+		if (file.eof())
+			break;
 
 		if (file.peek() != ':')
 			break;
@@ -1529,7 +1535,12 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 
 	// Total Spent
 	getline(file, s);
-	if (!cu::checkStream(file, error)) return false;
+	// If file.eof() was tested here, it would be mandatory to have a newline on the end of the file
+	if (file.fail())
+	{
+		error = "Unexpected input";
+		return false;
+	}
 	if (s.find('-') != string::npos)
 	{
 		error = "Invalid total spent: Total spent must be a positive integer";
@@ -1655,7 +1666,12 @@ bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned & 
 	lineTracker++;
 
 	fin >> n;
-	if (!cu::checkStream(fin, error)) return false;
+	// Testing fin.eof() would make it mandatory to have a newLine at the end of the file
+	if (fin.fail())
+	{
+		error = "Unexpected input";
+		return false;
+	}
 	if (!pack.setCurrentBookings(n))
 	{
 		error = "Invalid current bookings: Current bookings must be a integer between 1 and maximum bookings";
