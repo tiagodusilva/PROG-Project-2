@@ -717,12 +717,20 @@ void purchasePackMenu(Agency & agency)
 					cout << "Pack with id \"" << id << "\" not found" << endl;
 				}
 			}
+			else
+			{
+				return;
+			}
 		}
 		else
 		{
 			cout << "Client with VAT \"" << vat << "\" not found" << endl;
 		}
 		
+	}
+	else
+	{
+		return;
 	}
 
 	// Ends up here if any of the operations were unsuccessful
