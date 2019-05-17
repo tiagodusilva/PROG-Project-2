@@ -104,12 +104,10 @@ Date Date::now()
 bool Date::readUserInput()
 {
 	unsigned y, m, d;
-	bool fail = false;
+	bool fail;
 
 	do
 	{
-		if (fail)
-			cout << "Invalid Date!" << endl;
 		if (!cu::readUnsigned(y, "Year"))
 			return false;		
 		if (!cu::readUnsigned(m, "Month"))
@@ -119,6 +117,7 @@ bool Date::readUserInput()
 
 		*this = Date(y, m, d);
 		fail = !this->isValid();
+
 		if (fail)
 			cout << "Date invalid (example: 2019/05/32)" << endl;
 	} while (fail);

@@ -1140,6 +1140,7 @@ bool Agency::changeClient(const unsigned vat) {
 				client->setVAT(u);
 				break;
 			}
+			cout << "Vat already registered to another Client" << endl;
 		}
 		break;
 	case 3:
@@ -1150,7 +1151,7 @@ bool Agency::changeClient(const unsigned vat) {
 				return false;
 			}
 			if (u >= 1) break;
-			cout << "Insert a valid household number" << endl;
+			cout << "Household must be an integer larger than 1" << endl;
 		}
 		client->setHousehold(u); break;
 	case 4:
@@ -1253,6 +1254,7 @@ bool Agency::changePack(const int id)
 				return false;
 			if (pack->setDeparture(aDate))
 				break;
+			cout << "Departure Date must be after the Return Date" << endl;
 		}
 		break;
 
@@ -1264,6 +1266,7 @@ bool Agency::changePack(const int id)
 				return false;
 			if (pack->setReturn(aDate))
 				break;
+			cout << "Return Date must not be before the Departure Date" << endl;
 		}
 		break;
 
@@ -1276,6 +1279,7 @@ bool Agency::changePack(const int id)
 				return false;
 			if (pack->setPrice(aux))
 				break;
+			cout << "Price must be a positive integer" << endl;
 		}
 
 		if (!cu::readConfirmation(c, "Do you wish to reflect this change in all the Clients' Total Spent"))
@@ -1313,6 +1317,7 @@ bool Agency::changePack(const int id)
 				return false;
 			if (pack->setMaxBookings(aux))
 				break;
+			cout << "Maximum bookings must be an integer larger than 1 and larger than the Current Bookings" << endl;
 		}
 		break;
 	default:
