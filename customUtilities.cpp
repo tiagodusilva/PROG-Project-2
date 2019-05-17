@@ -112,7 +112,7 @@ namespace cu
 					return true;
 				}
 			}
-			catch (std::exception& e) {}
+			catch (...) {}
 		} while (true);
 	}
 

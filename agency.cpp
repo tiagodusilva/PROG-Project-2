@@ -1426,7 +1426,7 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 	{
 		u = stoul(s);
 	}
-	catch (std::exception & e)
+	catch (...)
 	{
 		error = "Invalid VAT: Vat must be a positive integer";
 		return false;
@@ -1455,7 +1455,7 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 	{
 		u = stoul(s);
 	}
-	catch (std::exception & e)
+	catch (...)
 	{
 		error = "Invalid household: Household must be an integer larger than 1";
 		return false;
@@ -1550,7 +1550,7 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 	{
 		u = stoul(s);
 	}
-	catch (std::exception & e)
+	catch (...)
 	{
 		error = "Invalid total spent: Total spent must be a positive integer";
 		return false;
