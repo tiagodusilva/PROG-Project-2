@@ -15,6 +15,9 @@ Written in c++ and using the required classes.
 		thorough, crosschecking pack Ids and Client VATs with each other. As an
 		example, if a client has a registered a pack that is missing from the packFile,
 		the program will detect it and abort execution.
+	- Everytime an error occurs while reading a file, the program indicates the line
+		and file where they were found, as well as another more detailed message
+		containing a hint about the error.
 	- As our printPack methods automatically included a version where they showed all
 		Packs or only available Packs, we included both in the final menu. As a result
 		all the filters (destination and dates) can be applied to either all or only
@@ -33,5 +36,8 @@ Written in c++ and using the required classes.
 		if Ctrl+Z is inserted in the "View Packs" menu, it will bring you back to the
 		"Main Menu". If you are purchasing a pack and insert Ctrl+Z, it will cancel the
 		purchase operation.
+	- This version of the project does not use system() because it's just generally bad,
+		a previous version with a more polished interface (using cls) exists only in the
+		project's gitHub.
 	- As it was not specified in the project guidelines, whenever a Client hasn't bought
-		a single pack, the value written in the client file for "Packs bought" is "-"
+		a single pack, the value written in the client file for "Packs bought" is "-".
