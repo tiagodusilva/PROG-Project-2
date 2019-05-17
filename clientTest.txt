@@ -1,0 +1,27 @@
+Jose Socrates
+12345678
+4
+Rua do Apartamento / 75 / 2 / 1234-567 / Paris
+1 ; 2 ; 3
+600
+::::::::::
+Joe Berardo
+1234
+1
+Rua da sua Garagem / 420 / - / 1234-123 / Madeira
+-
+0
+::::::::::
+Ricardo Salgado
+420420
+6
+Avenida do BES / 666 / - / 1234-321 / Portugalia
+1 ; 4 ; 4 ; 4
+450
+::::::::::
+Carlos Santos Silva
+12344321
+2
+Rua da Amizade / 780 / 40 / 5879-312 / Portugalia
+1 ; 2 ; 3 ; 4
+650
