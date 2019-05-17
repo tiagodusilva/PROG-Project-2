@@ -49,7 +49,7 @@ public:
 		LineTracker is used to be able to produce a better error message in case something breaks
 		Returns false if the file ends or an unexpected input is found
 	*/
-	bool readFromFile(std::ifstream& fin, unsigned int& lineTracker);
+	bool readFromFile(std::ifstream& fin, unsigned int& lineTracker, std::string & error);
 
 private:
 	std::string street, doorNumber, floor, zipCode, locality;

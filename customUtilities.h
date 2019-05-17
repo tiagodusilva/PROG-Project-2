@@ -65,6 +65,13 @@ namespace cu
 	bool readInt(int& n, const std::string msg);
 
 	/**
+		Read an unsigned from user input, taking care of invalid inputs (not unsiged, including negatives)
+		Presents msg + " ? "
+		Return false if user interrupts with Ctrl+Z	
+	*/
+	bool readUnsigned(unsigned & n, const std::string msg);
+
+	/**
 		Read a string from user input, waits for a not empty string
 		Presents msg + " ? "
 		Return false if user interrupts with Ctrl+Z
@@ -90,6 +97,12 @@ namespace cu
 		Method may change in the future
 	*/
 	void clearConsole();
+
+	/**
+		Checks stream.eof() and stream.fail()
+		When it returns false, a more detailed message is given in the error string
+	*/
+	bool checkStream(std::istream & stream, std::string & error);
 }
 
 #endif

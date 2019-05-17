@@ -92,6 +92,30 @@ namespace cu
 		return true;
 	}
 
+	bool readUnsigned(unsigned & u, const string msg)
+	{
+		string s;
+		do
+		{
+			try
+			{	
+				cout << msg << " ? ";
+				getline(cin, s);
+				if (cin.eof())
+				{
+					cin.clear();
+					return false;
+				}
+				if (s.find('-') == string::npos)
+				{
+					u = stoul(s);
+					return true;
+				}
+			}
+			catch (std::exception& e) {}
+		} while (true);
+	}
+
 	bool readStr(string & s, const string msg)
 	{
 		do
@@ -137,6 +161,22 @@ namespace cu
 	{
 		// Most portable way without using system(), conio.h, ncurses or an OS specific implementation
 		// Saldy just moves everything up 40 lines...
-		cout << "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n";
+		cout << string(40, '\n');
 	}
+
+	bool checkStream(std::istream & stream, std::string & error)
+	{
+		if (stream.eof())
+		{
+			error = "Reached end of file unexpectedly";
+			return false;
+		}
+		if (stream.fail())
+		{
+			error = "Unexpected input";
+			return false;
+		}
+		return true;
+	}
+
 }

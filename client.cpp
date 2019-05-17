@@ -17,15 +17,6 @@ Client::Client()
 	travelPacks = {};
 }
 
-Client::Client(string name, unsigned vat, unsigned short household, Address address) {
-	this->travelPacks = {};
-	this->totalSpent = 0;
-	this->name = name;
-	this->vat = vat;
-	this->household = household;
-	this->address = address;
-}
-
 Client::Client(string name, unsigned vat, unsigned short household, Address address, vector<int> & travelPacks, unsigned totalSpent) {
 	this->name = name;
 	this->vat = vat;
@@ -33,18 +24,6 @@ Client::Client(string name, unsigned vat, unsigned short household, Address addr
 	this->address = address;
 	this->travelPacks = travelPacks;
 	this->totalSpent = totalSpent;
-}
-
-bool verifyVAT(unsigned int vat, vector<Client> clients) {
-	for (size_t i = 0; i < clients.size(); i++)
-	{
-		if (clients.at(i).getVAT() == vat)
-		{
-			cout << "VAT number already in use!\n";
-			return false;
-		}
-	}
-	return true;
 }
 
 #pragma region GETTERS
@@ -96,14 +75,9 @@ bool Client::setName(string new_name) {
 	return true;
 }
 
-bool Client::setVAT(unsigned new_vat, vector<Client> clients) {
-
-	if (verifyVAT(new_vat, clients)) {
+bool Client::setVAT(unsigned new_vat) {
 		this->vat = new_vat;
 		return true;
-	}
-
-	return false;
 }
 
 bool Client::setHousehold(unsigned short new_household) {

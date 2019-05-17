@@ -706,6 +706,11 @@ void purchasePackMenu(Agency & agency)
 							return;
 						}
 					}
+					else
+					{
+						cout << "Operation aborted" << endl;
+						return;
+					}
 				}
 				else
 				{
@@ -826,7 +831,17 @@ bool loadAgencyDataMenu(Agency & agency)
 		return false;
 	}
 
-	return agency.loadData(s, true);
+	string error;
+	if (agency.loadData(s, error))
+	{
+		cout << "Agency loaded successfully" << endl;
+		return true;
+	}
+	else
+	{
+		cout << error << endl;
+		return false;
+	}
 }
 
 // Public Function

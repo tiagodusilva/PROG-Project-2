@@ -173,46 +173,106 @@ bool Address::readUserInput()
 	return true;
 }
 
-bool Address::readFromFile(ifstream & fin, unsigned int & lineTracker)
+bool Address::readFromFile(std::ifstream & fin, unsigned int & lineTracker, std::string & error)
 {
 	string s, sub;
 	int start, end;
 	getline(fin, s);
-	if (fin.eof() || fin.fail()) return false;
+	if (!cu::checkStream(fin, error)) return false;
 
 	start = 0;
 	end = s.find('/');
-	if (end == string::npos) return false;
+	if (end == string::npos)
+	{
+		error = "Address separator / not found";
+		return false;
+	}
 	sub = s.substr(start, end - start);
 	cu::strTrim(sub);
-	if (!this->setStreet(sub)) return false;
+	if (sub.empty())
+	{
+		error = "Street field must not be empty";
+		return false;
+	}
+	if (!this->setStreet(sub))
+	{
+		error = "Invalid street";
+		return false;
+	}
 
 	start = end + 1;
 	end = s.find('/', start);
-	if (end == string::npos) return false;
+	if (end == string::npos)
+	{
+		error = "Address separator / not found";
+		return false;
+	}
 	sub = s.substr(start, end - start);
 	cu::strTrim(sub);
-	if (!this->setDoorNumber(sub)) return false;
+	if (sub.empty())
+	{
+		error = "Door number field must not be empty";
+		return false;
+	}
+	if (!this->setDoorNumber(sub))
+	{
+		error = "Door number is incorrect. It must always be a positive number";
+		return false;
+	}
 
 	start = end + 1;
 	end = s.find('/', start);
-	if (end == string::npos) return false;
+	if (end == string::npos)
+	{
+		error = "Address separator / not found";
+		return false;
+	}
 	sub = s.substr(start, end - start);
 	cu::strTrim(sub);
-	if (!this->setFloor(sub)) return false;
+	if (sub.empty())
+	{
+		error = "Floor field must not be empty";
+		return false;
+	}
+	if (!this->setFloor(sub))
+	{
+		error = "Invalid Floor (if there is no floor, it must be \"-\"";
+		return false;
+	}
 
 	start = end + 1;
 	end = s.find('/', start);
-	if (end == string::npos) return false;
+	if (end == string::npos)
+	{
+		error = "Address separator / not found";
+		return false;
+	}
 	sub = s.substr(start, end - start);
 	cu::strTrim(sub);
-	if (!this->setZipCode(sub)) return false;
+	if (sub.empty())
+	{
+		error = "Zip Code field must not be empty";
+		return false;
+	}
+	if (!this->setZipCode(sub))
+	{
+		error = "Invalid Zip code (must be in format XXXX-XXX)";
+		return false;
+	}
 
 	start = end + 1;
 	sub = s.substr(start, string::npos);
 	cu::strTrim(sub);
-	if (!this->setLocality(sub)) return false;
-
+	if (sub.empty())
+	{
+		error = "Locality field must not be empty";
+		return false;
+	}
+	if (!this->setLocality(sub))
+	{
+		error = "Invalid locality";
+		return false;
+	}
 	lineTracker++;
 	return true;
 }

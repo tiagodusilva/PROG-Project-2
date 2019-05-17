@@ -103,18 +103,18 @@ Date Date::now()
 
 bool Date::readUserInput()
 {
-	int y, m, d;
+	unsigned y, m, d;
 	bool fail = false;
 
 	do
 	{
 		if (fail)
 			cout << "Invalid Date!" << endl;
-		if (!cu::readInt(y, "Year"))
+		if (!cu::readUnsigned(y, "Year"))
 			return false;		
-		if (!cu::readInt(m, "Month"))
+		if (!cu::readUnsigned(m, "Month"))
 			return false;		
-		if (!cu::readInt(d, "Day"))
+		if (!cu::readUnsigned(d, "Day"))
 			return false;
 
 		*this = Date(y, m, d);
@@ -125,16 +125,20 @@ bool Date::readUserInput()
 
 }
 
-bool Date::readFromFile(ifstream& fin, unsigned int& lineTracker)
+bool Date::readFromFile(std::ifstream& file, unsigned int& lineTracker, std::string & error)
 {
 	string s;
-	getline(fin, s);
-	if (fin.eof() || fin.fail()) return false;
+	getline(file, s);
+	if (!cu::checkStream(file, error)) return false;
 
 	bool isValid;
 	*this = Date(s, isValid);
 
-	if (!isValid) return false;
+	if (!isValid)
+	{
+		error = "Date has an invalid format or has values out of range (ex: 2018/5/32)";
+		return false;
+	}
 	
 	lineTracker++;
 	return true;

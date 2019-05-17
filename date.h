@@ -50,7 +50,7 @@ public:
 		Returns false if the Date is invalid
 		Also reeturns false if ifstrean.eof() or ifstream.fail() are detected
 	*/
-	bool readFromFile(std::ifstream& fin, unsigned int& lineTracker);
+	bool readFromFile(std::ifstream& file, unsigned int& lineTracker, std::string & error);
 
 	/**
 		Returns true if it's a leap year

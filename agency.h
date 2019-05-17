@@ -49,11 +49,17 @@ public:
 
 	/**
 		Loads all the data related to an Agency
-		If isVerbose is true, it print to cout/cerr the status of the operation
+		If it returns false, error will contain more details
 	*/
-	bool loadData(const std::string & agencyFileName, const bool isVerbose);
+	bool loadData(const std::string & agencyFileName, std::string & error);
 
-	bool readAgencyFromFile(std::ifstream & file, unsigned & lineTracker);
+	/**
+		Reads all the Agency data from a file
+		Returns false if it encounters an unexpected error
+		If it returns false, error will contain more details
+		WARNING: Does not check if file exists
+	*/
+	bool readAgencyFromFile(std::ifstream & file, unsigned & lineTracker, std::string & error);
 
 	/**
 		Reads a new Client from user input
@@ -64,8 +70,12 @@ public:
 
 	/**
 		Reads all the Clients from a file
+		If file is empty, sets packList to {}
+		Returns false if it encounters an unexpected error
+		If it returns false, error will contain more details
+		WARNING: Does not check if file exists
 	*/
-	bool readAllClientsFromFile(std::ifstream & file, unsigned & lineTracker);
+	bool readAllClientsFromFile(std::ifstream & file, unsigned & lineTracker, std::string & error);
 
 	/**
 		Reads a new Pack from user input
@@ -78,9 +88,10 @@ public:
 		Reads all the packs from a file
 		If file is empty, sets packList to {}
 		Returns false if it encounters an unexpected error
+		If it returns false, error will contain more details
 		WARNING: Does not check if file exists
 	*/
-	bool readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker);
+	bool readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker, std::string & error);
 
 
 	// OUTPUT METHODS
@@ -238,17 +249,17 @@ private:
 
 	/**
 		Read one Client from file
-		Return false if it fails
-		Checks if read CLient's pack Ids are registered in the Agency
+		Return false if it fails and error contains a detailed message
+		Checks if read Client's pack Ids are registered in the Agency
 	*/
-	bool readClientFromFile(std::ifstream & file, Client & client, unsigned & lineTracker);
+	bool readClientFromFile(std::ifstream & file, Client & client, unsigned & lineTracker, std::string & error);
 
 	/**
 		Reads one TravelPack from file
-		Returns false if it fails
+		Returns false if it fails and error contains a detailed message
 		Checks if read pack's Id is already registered in the Agency
 	*/
-	bool readPackFromFile(std::ifstream & fin, TravelPack & pack, unsigned & lineTracker);
+	bool readPackFromFile(std::ifstream & fin, TravelPack & pack, unsigned & lineTracker, std::string & error);
 
 	void printAllClientsToFile() const;
 

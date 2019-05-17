@@ -124,29 +124,27 @@ bool Agency::setPackets(std::vector<TravelPack> & new_packList) {
 
 // READ METHODS
 
-bool Agency::loadData(const std::string & agencyFileName, const bool isVerbose)
+bool Agency::loadData(const std::string & agencyFileName, std::string & error)
 {
 	ifstream file;
 	unsigned lineTracker = 1;
 	file.open(agencyFileName);
 	if (!file) // if file does not exist
 	{
-		if (isVerbose)
-			cerr << "ERROR: Agency file \"" << agencyFileName << "\" does not exist" << endl;
+		error = "ERROR: Agency file \"" + agencyFileName + "\" does not exist";
+		file.close();
 		return false;
 	}
 	if (cu::isFileEmpty(file))
 	{
-		if (isVerbose)
-			cerr << "ERROR: Agency file is empty" << endl;
+		error = "ERROR: Agency file is empty";
 		file.close();
 		return false;
 	}
 
-	if (!this->readAgencyFromFile(file, lineTracker))
+	if (!this->readAgencyFromFile(file, lineTracker, error))
 	{
-		if (isVerbose)
-			cerr << "ERROR: Wrong input at line " << lineTracker << " of file \"" << agencyFileName << "\"" << endl;
+		error =  "ERROR: Wrong input at line " + to_string(lineTracker) + " of file \"" + agencyFileName + "\"\n" + error;
 		file.close();
 		return false;
 	}
@@ -156,17 +154,13 @@ bool Agency::loadData(const std::string & agencyFileName, const bool isVerbose)
 	file.open(this->fileNamePacks);
 	if (!file) // if file does not exist
 	{
-		if (isVerbose)
-			cerr << "ERROR: Packs file \"" << this->fileNamePacks << "\" does not exist, shutting down..." << endl;
+		error = "ERROR: Packs file \"" + this->fileNamePacks + "\" does not exist";
 		file.close();
-		exit(42);
-		return false; // Should never execute
+		return false;
 	}
 	lineTracker = 1;
-	if (!this->readAllPacksFromFile(file, lineTracker))
+	if (!this->readAllPacksFromFile(file, lineTracker, error))
 	{
-		if (isVerbose)
-			cerr << "ERROR: Wrong input at line " << lineTracker << " of file \"" << this->fileNamePacks << "\"" << endl;
 		file.close();
 		return false;
 	}
@@ -175,58 +169,52 @@ bool Agency::loadData(const std::string & agencyFileName, const bool isVerbose)
 	file.open(this->fileNameClients);
 	if (!file) // if file does not exist
 	{
-		if (isVerbose)
-			cerr << "ERROR: Clients file \"" << this->fileNameClients << "\" does not exist, shutting down..." << endl;
+		error = "ERROR: Clients file \"" + this->fileNameClients + "\" does not exist";
 		file.close();
-		exit(42);
 		return false; // Should never execute
 	}
 	lineTracker = 1;
-	if (!this->readAllClientsFromFile(file, lineTracker))
+	if (!this->readAllClientsFromFile(file, lineTracker, error))
 	{
-		if (isVerbose)
-			cerr << "ERROR: Wrong input at line " << lineTracker << " of file \"" << this->fileNameClients << "\"" << endl;
 		file.close();
 		return false;
 	}
 	file.close();
 
-	if (isVerbose)
-		cout << "Agency data loaded correctly" << endl;
-
 	return true;
 }
 
-bool Agency::readAgencyFromFile(ifstream & file, unsigned & lineTracker) {
+bool Agency::readAgencyFromFile(ifstream & file, unsigned & lineTracker, std::string & error) {
 	Address address;
 
 	getline(file, this->name);
-	if (file.eof()) return false;
+	if (!cu::checkStream(file, error)) return false;
 	lineTracker++;
 
 	file >> this->vat;
-	if (file.eof()) return false;
+	if (!cu::checkStream(file, error)) return false;
 	file.ignore(1000, '\n');
 	lineTracker++;
 
 	getline(file, this->url);
-	if (file.eof()) return false;
+	if (!cu::checkStream(file, error)) return false;
 	lineTracker++;
 
-	if (!this->address.readFromFile(file, lineTracker)) return false;
+	if (!this->address.readFromFile(file, lineTracker, error)) return false;
 
 	getline(file, this->fileNameClients);
-	if (file.eof()) return false;
+	if (!cu::checkStream(file, error)) return false;
 	lineTracker++;
 
 	getline(file, this->fileNamePacks);
+	if (!cu::checkStream(file, error)) return false;
 	lineTracker++;
 
 	return true;
 }
 
 bool Agency::readNewClientUserInput() {
-	int n;
+	unsigned u;
 	string str;
 	Client newClient;
 	Address auxAddress;
@@ -236,12 +224,12 @@ bool Agency::readNewClientUserInput() {
 	} while (!newClient.setName(str));
 
 	do {
-		if (!cu::readInt(n, "VAT")) return false;
-	} while (!newClient.setVAT(n, clientList));
+		if (!cu::readUnsigned(u, "VAT")) return false;
+	} while (this->isVatUsed(u) || !newClient.setVAT(u));
 
 	do {
-		if (!cu::readInt(n, "Household")) return false;
-	} while (!newClient.setHousehold(n));
+		if (!cu::readUnsigned(u, "Household")) return false;
+	} while (!newClient.setHousehold(u));
 
 	do
 	{
@@ -255,12 +243,12 @@ bool Agency::readNewClientUserInput() {
 	return true;
 }
 
-bool Agency::readAllClientsFromFile(std::ifstream & file, unsigned & lineTracker)
+bool Agency::readAllClientsFromFile(std::ifstream & file, unsigned & lineTracker, std::string & error)
 {
 	if (cu::isFileEmpty(file))
 	{
-		cout << "WARNING: Clients file \"" << this->fileNameClients << "\" is empty" << endl;
-		cout << "Assuming there are no clients" << endl;
+		//cout << "WARNING: Clients file \"" << this->fileNameClients << "\" is empty" << endl;
+		//cout << "Assuming there are no clients" << endl;
 		this->packList = {};
 		return true;
 	}
@@ -268,11 +256,16 @@ bool Agency::readAllClientsFromFile(std::ifstream & file, unsigned & lineTracker
 	while (true)
 	{
 		Client aux;
-		if (!this->readClientFromFile(file, aux, lineTracker))
+		if (!this->readClientFromFile(file, aux, lineTracker, error))
+		{
+			error = "ERROR: Wrong input at line " + to_string(lineTracker) + " of file \"" +
+				this->fileNameClients + "\"\n" + error;
 			return false;
+		}
 
 		this->clientList.push_back(aux);
 
+		cout << "_" << (char)file.peek() << "_" << endl;
 		if (file.peek() != ':')
 			break;
 
@@ -345,12 +338,12 @@ bool Agency::readNewPackUserInput()
 	return true;
 }
 
-bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker)
+bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker, std::string & error)
 {
 	if (cu::isFileEmpty(file))
 	{
-		cout << "WARNING: Packs file \"" << this->fileNamePacks << "\" is empty" << endl;
-		cout << "Assuming there are no travel packs" << endl;
+		// cout << "WARNING: Packs file \"" << this->fileNamePacks << "\" is empty" << endl;
+		// cout << "Assuming there are no travel packs" << endl;
 		this->packList = {};
 		return true;
 	}
@@ -361,17 +354,23 @@ bool Agency::readAllPacksFromFile(std::ifstream & file, unsigned & lineTracker)
 	n = abs(n);
 	this->maxPackId = n;
 	lineTracker++;
+	unsigned packStart;
 
 	while (true)
 	{
 		TravelPack aux;
-		if (!this->readPackFromFile(file, aux, lineTracker))
+		packStart = lineTracker;
+		if (!this->readPackFromFile(file, aux, lineTracker, error))
+		{
+			error = "ERROR: Wrong input at line " + to_string(lineTracker) + " of file \"" + this->fileNamePacks + "\"\n" + error;
 			return false;
+		}
 
 		// if a pack has an Id larger than the given maxPackId
 		if (abs(aux.getId()) > n)
 		{
-			lineTracker = 1;
+			error = "ERROR: Wrong input at line " + to_string(packStart) + " of file \"" +
+				this->fileNamePacks + "\"\nPack ID is larger than the Maximum Pack ID given in line 1";
 			return false;
 		}
 
@@ -468,28 +467,30 @@ void Agency::printPacksByClient(const int vat) const
 			// Loop through all of its TravelPacks
 			for (size_t j = 0; j < this->clientList.at(i).getTravelPacksListSize(); j++)
 			{
-				int pack = this->clientList.at(i).getTravelPackAt(j);
-				if (printedPacks.find(pack) == printedPacks.end())
-				{
-					// Set doesn't have this pack
-					printedPacks.insert(pack);
-					// Print pack with this ID
-					if (count == 0)
-					{
-						this->printPackById(pack);
-					}
-					else
-					{
-						cout << PACK_OUTPUT_SEPARATOR << endl;
-						this->printPackById(pack);
-					}
-				}
+				// Inserts into set only if it doesn't already exist
+				printedPacks.insert(this->clientList.at(i).getTravelPackAt(j));
 			}
-			return;
 		}
 	}
 
-	cout << "Client with VAT \"" << vat << "\" not found" << endl;
+	for (auto x : printedPacks)
+	{
+		// Print pack with this ID
+		if (count == 0)
+		{
+			this->printPackById(x);
+		}
+		else
+		{
+			cout << PACK_OUTPUT_SEPARATOR << endl;
+			this->printPackById(x);
+		}
+	}
+
+	if (count == 0)
+		cout << "Client with VAT \"" << vat << "\" not found" << endl;
+
+	return;
 }
 
 bool Agency::printPackById(const int id) const
@@ -530,6 +531,8 @@ void Agency::printPacksSoldToEveryone() const
 		if (packSet.empty())
 			break;
 
+		// Weird for loop beause we need to iterate and remove elements from the set at the same time
+		// Weird for loop beause we need to iterate and remove elements from the set at the same time
 		for (auto it = packSet.begin(); it != packSet.end(); )
 		{
 			if (!this->clientList.at(i).hasBought(*it))
@@ -1049,6 +1052,7 @@ bool Agency::makePackUnavailableByIndex(const int index)
 // This is kinda agencyMenu, but private stuff is private
 bool Agency::changeClient(const unsigned vat) {
 	int num;
+	unsigned u;
 	string str;
 	Address auxAddress;
 
@@ -1096,29 +1100,29 @@ bool Agency::changeClient(const unsigned vat) {
 		client->setName(str); break;
 	case 2:
 		while (true) {
-			if (!cu::readInt(num, "New VAT"))
+			if (!cu::readUnsigned(u, "New VAT"))
 			{
 				cout << "Operation aborted" << endl;
 				return false;
 			}
-			if (!isVatUsed(num))
+			if (!isVatUsed(u))
 			{
-				client->setVAT(num, this->clientList);
+				client->setVAT(u);
 				break;
 			}
 		}
 		break;
 	case 3:
 		while (true) {
-			if (!cu::readInt(num, "New Household"))
+			if (!cu::readUnsigned(u, "New Household"))
 			{
 				cout << "Operation aborted" << endl;
 				return false;
 			}
-			if (num >= 1) break;
+			if (u >= 1) break;
 			cout << "Insert a valid household number" << endl;
 		}
-		client->setHousehold(num); break;
+		client->setHousehold(u); break;
 	case 4:
 		if (!auxAddress.readUserInput())
 		{
@@ -1387,42 +1391,99 @@ bool Agency::clientMap(std::map<int, int> & clientMap, int & clientCounter, cons
 
 // PRIVATE METHODS
 
-bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned & lineTracker) {
-	string str;
+bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned & lineTracker, std::string & error) {
+	string s;
 	Address auxAddress;
 	vector<int> travelPacks = {};
-	unsigned int auxInt;
+	unsigned u;
 
-
-	getline(file, str);
-	if (file.eof() || file.fail() || !client.setName(str)) return false;
+	// Name
+	getline(file, s);
+	if (!cu::checkStream(file, error)) return false;
+	if (!client.setName(s))
+	{
+		error = "Invalid name";
+		return false;
+	}
 	lineTracker++;
 
-	file >> auxInt;
-	if (file.eof() || file.fail() || !client.setVAT(auxInt, clientList)) return false;
+	// VAT
+	getline(file, s);
+	if (!cu::checkStream(file, error)) return false;
+	if (s.find('-') != string::npos)
+	{
+		error = "Invalid VAT: VAT must be a positive integer";
+		return false;
+	}
+	try
+	{
+		u = stoul(s);
+	}
+	catch (std::exception & e)
+	{
+		error = "Invalid VAT: Vat must be a positive integer";
+		return false;
+	}
+	if (this->isVatUsed(u))
+	{
+		error = "Invalid VAT: VAT is already in use";
+		return false;
+	}
+	if (!client.setVAT(u))
+	{
+		error = "Invalid VAT";
+		return false;
+	}
 	lineTracker++;
 
-	file >> auxInt;
-	if (file.eof() || file.fail() || !client.setHousehold(auxInt)) return false;
+	// Household
+	getline(file, s);
+	if (!cu::checkStream(file, error)) return false;
+	if (s.find('-') != string::npos)
+	{
+		error = "Invalid household: Household must be an integer larger than 1";
+		return false;
+	}
+	try
+	{
+		u = stoul(s);
+	}
+	catch (std::exception & e)
+	{
+		error = "Invalid household: Household must be an integer larger than 1";
+		return false;
+	}
+	if (!client.setHousehold(u))
+	{
+		error = "Invalid household: Household must be an integer larger than 1";
+		return false;
+	}
 	lineTracker++;
-	file.ignore(1000, '\n');
 
-	if (!auxAddress.readFromFile(file, lineTracker))
+
+	// Address
+	if (!auxAddress.readFromFile(file, lineTracker, error))
 		return false;
 	if (!client.setAddress(auxAddress))
 	{
+		error = "Invalid Address";
 		--lineTracker; // Decrease lineTracker to the correct line before exiting
 		return false;
 	}
 
+	// Bought Packs
 	if (file.peek() != '-')
 	{
 		int num;
 		while (true)
 		{
 			file >> num;
-			if (file.eof() || file.fail()) return false;
-			if (!this->isIdUsed(num)) return false;
+			if (!cu::checkStream(file, error)) return false;
+			if (!this->isIdUsed(num))
+			{
+				error = "Invalid pack ID: Pack with id \"" + to_string(num) + "\" not found in the Agency";
+				return false;
+			}
 
 			travelPacks.push_back(num);
 
@@ -1434,7 +1495,7 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 				if (file.peek() == ';')
 				{
 					file.get();
-					if (file.eof()) return false;
+					if (!cu::checkStream(file, error)) return false;
 				}
 				else
 					break;
@@ -1442,46 +1503,81 @@ bool Agency::readClientFromFile(std::ifstream & file, Client & client, unsigned 
 			else if (file.peek() == ';')
 			{
 				file.get();
-				if (file.eof()) return false;
+				if (!cu::checkStream(file, error)) return false;
 			}
 			else
 				break;
 		}
 
-		if (!client.setTravelPacksList(travelPacks)) return false;
+		if (!client.setTravelPacksList(travelPacks))
+		{
+			error = "Invalid pack vector";
+			return false;
+		}
 		lineTracker++;
 	}
 	else // If it peeks a '-'
 	{
-		file.ignore(1000, '\n'); // Advance to the next line
-		if (!client.setTravelPacksList(travelPacks)) return false; // Sets to {} ( travelPacks is initialized to {} )
+		if (!client.setTravelPacksList(travelPacks)) // Sets to {} ( travelPacks is initialized to {} )
+		{
+			error = "Invalid pack vector";
+			return false;
+		}
 	}
+	file.ignore(1000, '\n'); // Advance to the next line
 
-	file >> auxInt;
-	if (file.eof() || file.fail() || !client.setTotalSpent(auxInt)) return false;
+	// Total Spent
+	getline(file, s);
+	if (!cu::checkStream(file, error)) return false;
+	if (s.find('-') != string::npos)
+	{
+		error = "Invalid total spent: Total spent must be a positive integer";
+		return false;
+	}
+	try
+	{
+		u = stoul(s);
+	}
+	catch (std::exception & e)
+	{
+		error = "Invalid total spent: Total spent must be a positive integer";
+		return false;
+	}
+	if (!client.setTotalSpent(u))
+	{
+		error = "Invalid total spent: Total spent must be a positive integer";
+		return false;
+	}
 	lineTracker++;
-
-	file.ignore(1000, '\n');
 
 	return true;
 }
 
-bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned & lineTracker)
+bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned & lineTracker, std::string & error)
 {
 	int n;
 	string s;
 	Date date;
 
 	fin >> n;
-	if (fin.eof() || fin.fail() || !pack.setId(n) || this->isIdUsed(n))
+	if (!cu::checkStream(fin, error)) return false;
+	if (this->isIdUsed(n))
+	{
+		error = "ID already attributed to another Pack";
 		return false;
+	}
+	if (!pack.setId(n))
+	{
+		error = "Invalid ID";
+		return false;
+	}
 	lineTracker++;
 
 	fin.ignore(1000, '\n');
 
-
+	// Read destinations line
 	getline(fin, s);
-	if (fin.eof() || fin.fail()) return false;
+	if (!cu::checkStream(fin, error)) return false;
 
 	// Separate all read locations
 	int start = 0, end = s.find('-');
@@ -1512,37 +1608,58 @@ bool Agency::readPackFromFile(std::ifstream& fin, TravelPack & pack, unsigned & 
 		} while (end != string::npos); // Stops reading once there's nothing more
 	}
 
-	if (!pack.setDestinations(destinations)) return false;
+	if (!pack.setDestinations(destinations))
+	{
+		error = "Invalid destinations (must be at least one)";
+		return false;
+	}
 	lineTracker++;
 
-	if (!date.readFromFile(fin, lineTracker))
+	if (!date.readFromFile(fin, lineTracker, error))
 		return false;
 	if (!pack.setDeparture(date))
 	{
+		error = "Invalid Date";
 		--lineTracker; // Decrease lineTracker to the correct line before exiting
 		return false;
 	}
 	// Auto updates lineTracker
 
-	if (!date.readFromFile(fin, lineTracker))
+	if (!date.readFromFile(fin, lineTracker, error))
 		return false;
 	if (!pack.setReturn(date))
 	{
+		error = "Invalid Date: return Date must be after the departure Date";
 		--lineTracker; // Decrease lineTracker to the correct line before exiting
 		return false;
 	}
 	// Auto updates lineTracker
 
 	fin >> n;
-	if (fin.eof() || fin.fail() || !pack.setPrice(n)) return false;
+	if (!cu::checkStream(fin, error)) return false;
+	if (!pack.setPrice(n))
+	{
+		error = "Invalid price: Price must be a positive integer";
+		return false;
+	}
 	lineTracker++;
 
 	fin >> n;
-	if (fin.eof() || fin.fail() || !pack.setMaxBookings(n))	return false;
+	if (!cu::checkStream(fin, error)) return false; 
+	if (!pack.setMaxBookings(n))
+	{
+		error = "Invalid maximum bookings: Maximum bookings must be an integer larger than 1";
+		return false;
+	}
 	lineTracker++;
 
 	fin >> n;
-	if (fin.eof() || fin.fail() || !pack.setCurrentBookings(n))	return false;
+	if (!cu::checkStream(fin, error)) return false;
+	if (!pack.setCurrentBookings(n))
+	{
+		error = "Invalid current bookings: Current bookings must be a integer between 1 and maximum bookings";
+		return false;
+	}
 	lineTracker++;
 
 	fin.ignore(1000, '\n');

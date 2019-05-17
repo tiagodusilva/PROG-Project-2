@@ -14,7 +14,6 @@ class Client
 {
 public:
 	Client();
-	Client(std::string name, unsigned vat, unsigned short household, Address address);
 	Client(std::string name, unsigned vat, unsigned short household, Address address, std::vector<int> & travelPacks, unsigned totalspent);  // client read from file
 
 	// GET methods
@@ -34,7 +33,7 @@ public:
 	// SET methods
 
 	bool setName(std::string new_name);
-	bool setVAT(unsigned new_VATnumber, std::vector<Client> clients);
+	bool setVAT(unsigned new_VATnumber);
 	bool setHousehold(unsigned short new_household);
 	bool setAddress(Address address);
 	bool setTravelPacksList(std::vector<int> & new_travelPacks);
